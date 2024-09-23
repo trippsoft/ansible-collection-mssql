@@ -10,6 +10,7 @@ mssql_configure_monitoring: false
 mssql_vault_manage_monitoring_credentials: false
 mssql_vault_configure_database_connection: false
 mssql_vault_create_secret_engines: true
+mssql_vault_manage_sa_password: true
 
 mssql_install_database_engine: true
 mssql_install_agent: true

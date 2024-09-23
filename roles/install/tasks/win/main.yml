@@ -1,4 +1,11 @@
 ---
+- name: Generate sa password
+  when:
+    - mssql_install_database_engine
+    - mssql_security_mode == 'mixed'
+    - mssql_vault_manage_sa_password
+  ansible.builtin.include_tasks: vault/sa.yml
+
 - name: Install
   ansible.builtin.include_tasks: win/install.yml
 

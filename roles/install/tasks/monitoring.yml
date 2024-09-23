@@ -1,7 +1,7 @@
 ---
 - name: Configure HashiCorp Vault monitoring credentials
   when:
-    - mssql_vault_managed_monitoring_credentials
+    - mssql_vault_manage_monitoring_credentials
   ansible.builtin.include_tasks: vault/monitoring.yml
 
 - name: Configure monitoring login

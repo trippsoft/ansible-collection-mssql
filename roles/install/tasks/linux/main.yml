@@ -1,4 +1,9 @@
 ---
+- name: Generate sa password
+  when:
+    - mssql_vault_manage_sa_password
+  ansible.builtin.include_tasks: vault/sa.yml
+
 - name: Add repositories
   ansible.builtin.include_tasks: linux/{{ ansible_os_family }}/repo.yml
 

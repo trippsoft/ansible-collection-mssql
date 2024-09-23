@@ -52,7 +52,6 @@ provisioner:
         _mssql_setup_source_path: "files/{{ mssql_version }}"
         mssql_host: "{{ ansible_host }}"
         mssql_user: sa
-        mssql_password: "{{ mssql_sa_password }}"
         mssql_configure_monitoring: true
         mssql_vault_manage_monitoring_credentials: true
         mssql_vault_configure_database_connection: true
@@ -63,7 +62,6 @@ provisioner:
         mssql_install_integration_services: true
         mssql_vault_sa_mount_point: mssql
         mssql_vault_sa_secret_path: users/sa
-        mssql_sa_password: SecurePassword123!
         mssql_version: ${MOLECULE_MSSQL_VERSION:-2022}
         mssql_monitoring_user: monitoring
         mssql_setup_path: "C:\\Windows\\temp\\{{ mssql_version }}"

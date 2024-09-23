@@ -1,4 +1,22 @@
 ---
+- name: Validate HashiCorp Vault SA credentials variables
+  when:
+    - mssql_vault_manage_sa_password
+  block:
+    - name: Validate sa credential mount point is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_sa_mount_point is defined
+        fail_msg: "The 'mssql_vault_sa_mount_point' variable is not defined."
+        success_msg: "The 'mssql_vault_sa_mount_point' variable is defined."
+
+    - name: Validate sa credential secret path is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_sa_secret_path is defined
+        fail_msg: "The 'mssql_vault_sa_secret_path' variable is not defined."
+        success_msg: "The 'mssql_vault_sa_secret_path' variable is defined."
+
 - name: Validate HashiCorp Vault monitoring credentials variables
   when:
     - mssql_vault_manage_monitoring_credentials
@@ -18,6 +36,8 @@
         success_msg: "The 'mssql_vault_monitoring_secret_path' variable is defined."
 
 - name: Validate SA password is defined
+  when:
+    - not mssql_vault_manage_sa_password
   ansible.builtin.assert:
     that:
       - mssql_sa_password is defined

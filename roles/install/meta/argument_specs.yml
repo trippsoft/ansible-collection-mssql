@@ -28,10 +28,10 @@ argument_specs:
       mssql_password:
         type: str
         required: false
-        default: "{{ mssql_sa_password }}"
         no_log: true
         description:
           - The password used to connect to the SQL Server instance for configuration.
+          - If not defined, the value of *mssql_sa_password* will be used.
       vault_url:
         type: str
         required: false
@@ -56,6 +56,13 @@ argument_specs:
         default: false
         description:
           - Whether to configure monitoring for the SQL Server instance.
+      mssql_vault_manage_sa_password:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to manage the `sa` password in HashiCorp Vault.
+          - On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.
       mssql_vault_manage_monitoring_credentials:
         type: bool
         required: false
@@ -63,12 +70,14 @@ argument_specs:
         description:
           - Whether to manage the monitoring password in HashiCorp Vault.
           - If *mssql_configure_monitoring* is `false`, this is ignored.
+          - On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.
       mssql_vault_configure_database_connection:
         type: bool
         required: false
         default: false
         description:
           - Whether to configure the database connection in HashiCorp Vault.
+          - On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.
       mssql_vault_create_secret_engines:
         type: bool
         required: false
@@ -132,8 +141,21 @@ argument_specs:
         no_log: true
         description:
           - The password for the `sa` account.
-          - On Linux, this is required.
-          - On Windows, if *mssql_security_mode* is `windows` this is ignored. Otherwise, this is required.
+          - If *mssql_vault_manage_sa_password* is `true`, this is password will be used if the secret does not exist and will be stored in Vault.  Otherwise, the previously stored password will be used.
+          - If *mssql_vault_manage_sa_password* is `false`, this is required.
+          - On Windows, if *mssql_security_mode* is `windows`, this is ignored.
+      mssql_vault_sa_mount_point:
+        type: str
+        required: false
+        description:
+          - The mount point for the KV2 secrets engine in HashiCorp Vault.
+          - If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.
+      mssql_vault_sa_secret_path:
+        type: str
+        required: false
+        description:
+          - The path to the secret in HashiCorp Vault.
+          - If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.
       mssql_version:
         type: str
         required: true

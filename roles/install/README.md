@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.0.2
+Version: 1.1.0
 
 This role installs Microsoft SQL Server.
 
@@ -32,13 +32,14 @@ This role installs Microsoft SQL Server.
 | mssql_host | <p>The hostname used to connect to the SQL Server instance for configuration.</p> | str | no |  | {{ ansible_host }} |
 | mssql_port | <p>The port used to connect to the SQL Server instance for configuration.</p> | int | no |  | {{ mssql_database_port }} |
 | mssql_user | <p>The username used to connect to the SQL Server instance for configuration.</p> | str | no |  | sa |
-| mssql_password | <p>The password used to connect to the SQL Server instance for configuration.</p> | str | no |  | {{ mssql_sa_password }} |
+| mssql_password | <p>The password used to connect to the SQL Server instance for configuration.</p><p>If not defined, the value of *mssql_sa_password* will be used.</p> | str | no |  |  |
 | vault_url | <p>The URL for accessing HashiCorp Vault.</p><p>Alternatively, this can be configured through ansible.cfg or environment variables.</p> | str | no |  |  |
 | vault_token | <p>The token for accessing HashiCorp Vault.</p><p>Alternatively, this (or any other authentication method) can be configured through ansible.cfg or environment variables.</p> | str | no |  |  |
 | mssql_configure_firewall | <p>Whether to configure the host firewall for the SQL Server instance.</p> | bool | no |  | true |
 | mssql_configure_monitoring | <p>Whether to configure monitoring for the SQL Server instance.</p> | bool | no |  | false |
-| mssql_vault_manage_monitoring_credentials | <p>Whether to manage the monitoring password in HashiCorp Vault.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p> | bool | no |  | true |
-| mssql_vault_configure_database_connection | <p>Whether to configure the database connection in HashiCorp Vault.</p> | bool | no |  | false |
+| mssql_vault_manage_sa_password | <p>Whether to manage the `sa` password in HashiCorp Vault.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | true |
+| mssql_vault_manage_monitoring_credentials | <p>Whether to manage the monitoring password in HashiCorp Vault.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | true |
+| mssql_vault_configure_database_connection | <p>Whether to configure the database connection in HashiCorp Vault.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | false |
 | mssql_vault_create_secret_engines | <p>Whether to create the secret engines in HashiCorp Vault.</p> | bool | no |  | true |
 | mssql_install_database_engine | <p>Whether to install the `SQL Server Database Engine` feature.</p><p>On Linux, this is ignored as it is required for any SQL Server component.</p> | bool | no |  | true |
 | mssql_install_agent | <p>Whether to install the `SQL Server Agent` feature.</p><p>On Windows, this is ignored as it is included with the `SQL Server Database Engine` feature automatically.</p><p>On Linux, this will enable SQL Server Agent in the configuration.</p><p>For SQL Server on Linux 2017, this will also install the separate `mssql-server-agent` package.</p> | bool | no |  | true |
@@ -47,7 +48,9 @@ This role installs Microsoft SQL Server.
 | mssql_install_analysis_services | <p>Whether to install the `Analysis Services` feature.</p><p>On Linux, this is ignored as this feature is not available.</p> | bool | no |  | false |
 | mssql_install_integration_services | <p>Whether to install the `Integration Services` feature.</p> | bool | no |  | false |
 | mssql_install_sql_server_management_studio | <p>Whether to install SQL Server Management Studio.</p><p>On Linux, this is ignored as this feature is not available.</p> | bool | no |  | true |
-| mssql_sa_password | <p>The password for the `sa` account.</p><p>On Linux, this is required.</p><p>On Windows, if *mssql_security_mode* is `windows` this is ignored. Otherwise, this is required.</p> | str | no |  |  |
+| mssql_sa_password | <p>The password for the `sa` account.</p><p>If *mssql_vault_manage_sa_password* is `true`, this is password will be used if the secret does not exist and will be stored in Vault.  Otherwise, the previously stored password will be used.</p><p>If *mssql_vault_manage_sa_password* is `false`, this is required.</p><p>On Windows, if *mssql_security_mode* is `windows`, this is ignored.</p> | str | no |  |  |
+| mssql_vault_sa_mount_point | <p>The mount point for the KV2 secrets engine in HashiCorp Vault.</p><p>If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.</p> | str | no |  |  |
+| mssql_vault_sa_secret_path | <p>The path to the secret in HashiCorp Vault.</p><p>If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.</p> | str | no |  |  |
 | mssql_version | <p>The version of the SQL Server to install.</p><p>On Linux, this will be validated against the distribution release for compatibility.</p><p>On Windows, this must match the version of the installation media.  This will not be validated.</p> | str | yes | <ul><li>2016</li><li>2017</li><li>2019</li><li>2022</li></ul> |  |
 | mssql_firewall_type | <p>The type of firewall to configure on Linux systems.</p><p>On Windows, this is ignored.</p><p>On EL systems, this defaults to `firewalld`.</p><p>On Ubuntu systems, this defaults to `ufw`.</p> | str | no | <ul><li>firewalld</li><li>ufw</li></ul> |  |
 | mssql_database_port | <p>The port for the SQL Server instance.</p><p>On Windows, this is ignored.</p> | int | no |  | 1433 |
