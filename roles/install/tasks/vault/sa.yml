@@ -11,7 +11,7 @@
 
 - name: Configure sa credential secret
   block:
-    - name: Check for monitoring credentials secret
+    - name: Check for sa credentials secret
       delegate_to: localhost
       community.hashi_vault.vault_kv2_get:
         token: "{{ vault_token | default(omit) }}"
