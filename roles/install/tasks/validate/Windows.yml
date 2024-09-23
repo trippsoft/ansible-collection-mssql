@@ -1,0 +1,163 @@
+---
+- name: Validate HashiCorp Vault variables
+  when:
+    - mssql_install_database_engine
+  block:
+    - name: Validate security mode is mixed
+      ansible.builtin.assert:
+        that:
+          - mssql_security_mode == 'mixed'
+        fail_msg: "The 'mssql_security_mode' variable is not set to 'mixed'.  The security mode must be set to 'mixed' to configure HashiCorp Vault."
+        success_msg: "The 'mssql_security_mode' variable is set to 'mixed'."
+
+    - name: Validate HashiCorp Vault monitoring credentials variables
+      when:
+        - mssql_vault_manage_monitoring_credentials
+      block:
+        - name: Validate monitoring mount point is defined
+          ansible.builtin.assert:
+            that:
+              - mssql_vault_monitoring_mount_point is defined
+            fail_msg: "The 'mssql_vault_monitoring_mount_point' variable is not defined."
+            success_msg: "The 'mssql_vault_monitoring_mount_point' variable is defined."
+
+        - name: Validate monitoring secret path is defined
+          ansible.builtin.assert:
+            that:
+              - mssql_vault_monitoring_secret_path is defined
+            fail_msg: "The 'mssql_vault_monitoring_secret_path' variable is not defined."
+            success_msg: "The 'mssql_vault_monitoring_secret_path' variable is defined."
+
+- name: Validate setup path is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_setup_path is defined
+    fail_msg: "The 'mssql_setup_path' variable is not defined."
+    success_msg: "The 'mssql_setup_path' variable is defined."
+
+- name: Check if setup path is a valid path
+  ansible.windows.win_stat:
+    path: "{{ mssql_setup_path }}"
+  register: _mssql_setup
+
+- name: Validate setup path is a valid path
+  ansible.builtin.assert:
+    that:
+      - _mssql_setup.stat.exists
+    fail_msg: "'{{ mssql_setup_path }}' is not a valid path."
+    success_msg: "'{{ mssql_setup_path }}' is a valid path."
+
+- name: Validate setup access password is defined
+  when:
+    - mssql_setup_access_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_setup_access_password is defined
+    fail_msg: "The 'mssql_setup_access_password' variable is not defined."
+    success_msg: "The 'mssql_setup_access_password' variable is defined."
+
+- name: Validate SA password is defined
+  when:
+    - mssql_install_database_engine
+    - mssql_security_mode == 'mixed'
+  ansible.builtin.assert:
+    that:
+      - mssql_sa_password is defined
+    fail_msg: "The 'mssql_sa_password' variable is not defined."
+    success_msg: "The 'mssql_sa_password' variable is defined."
+
+- name: Validate SQL Server service password is defined
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_agent_service_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_sql_server_agent_service_password is defined
+    fail_msg: "The 'mssql_sql_server_agent_service_password' variable is not defined."
+    success_msg: "The 'mssql_sql_server_agent_service_password' variable is defined."
+
+- name: Validate SQL Agent service password is defined
+  when:
+    - mssql_install_agent
+    - mssql_sql_server_agent_service_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_sql_server_agent_service_password is defined
+    fail_msg: "The 'mssql_sql_server_agent_service_password' variable is not defined."
+    success_msg: "The 'mssql_sql_server_agent_service_password' variable is defined."
+
+- name: Validate database sysadmin accounts is defined
+  when:
+    - mssql_install_database_engine 
+  ansible.builtin.assert:
+    that:
+      - mssql_database_sysadmin_accounts is defined
+    fail_msg: "The 'mssql_database_sysadmin_accounts' variable is not defined."
+    success_msg: "The 'mssql_database_sysadmin_accounts' variable is defined."
+
+- name: Validate Full-Text service password is defined
+  when:
+    - mssql_install_full_text
+    - mssql_full_text_filter_daemon_host_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_full_text_filter_daemon_host_password is defined
+    fail_msg: "The 'mssql_full_text_filter_daemon_host_password' variable is not defined."
+    success_msg: "The 'mssql_full_text_filter_daemon_host_password' variable is defined."
+
+- name: Validate Analysis Services service password is defined
+  when:
+    - mssql_install_analysis_services
+    - mssql_sql_server_analysis_services_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_sql_server_analysis_services_password is defined
+    fail_msg: "The 'mssql_sql_server_analysis_services_password' variable is not defined."
+    success_msg: "The 'mssql_sql_server_analysis_services_password' variable is defined."
+
+- name: Validate Analysis Services sysadmin accounts is defined
+  when:
+    - mssql_install_analysis_services
+  ansible.builtin.assert:
+    that:
+      - mssql_as_sysadmin_accounts is defined
+    fail_msg: "The 'mssql_as_sysadmin_accounts' variable is not defined."
+    success_msg: "The 'mssql_as_sysadmin_accounts' variable is defined."
+
+- name: Validate Integration Services password is defined
+  when:
+    - mssql_install_integration_services
+    - mssql_sql_server_integration_services_username is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_sql_server_integration_services_password is defined
+    fail_msg: "The 'mssql_sql_server_integration_services_password' variable is not defined."
+    success_msg: "The 'mssql_sql_server_integration_services_password' variable is defined."
+
+- name: Validate monitoring
+  when:
+    - mssql_install_database_engine
+    - mssql_configure_monitoring
+  block:
+    - name: Validate SQL security mode is mixed
+      ansible.builtin.assert:
+        that:
+          - mssql_security_mode == 'mixed'
+        fail_msg: "The 'mssql_security_mode' variable is not set to 'mixed'.  The security mode must be set to 'mixed' to configure monitoring."
+        success_msg: "The 'mssql_security_mode' variable is set to 'mixed'."
+
+    - name: Validate monitoring user is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_user is defined
+        fail_msg: "The 'mssql_monitoring_user' variable is not defined."
+        success_msg: "The 'mssql_monitoring_user' variable is defined."
+
+    - name: Validate monitoring password is defined
+      when:
+        - not mssql_vault_manage_monitoring_credentials
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_password is defined
+        fail_msg: "The 'mssql_monitoring_password' variable is not defined."
+        success_msg: "The 'mssql_monitoring_password' variable is defined."

@@ -1,0 +1,34 @@
+---
+- name: Add Microsoft SQL common repository
+  become: true
+  ansible.builtin.deb822_repository:
+    architectures:
+      - amd64
+      - armhf
+      - arm64
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris:
+      - "{{ _mssql_prod_repo_url }}"
+    suites:
+      - "{{ ansible_distribution_release }}"
+    components:
+      - main
+    name: mssql-release
+    state: present
+
+- name: Add Microsoft SQL Server repository
+  become: true
+  ansible.builtin.deb822_repository:
+    architectures:
+      - amd64
+      - armhf
+      - arm64
+    signed_by: https://packages.microsoft.com/keys/microsoft.asc
+    uris:
+      - "{{ _mssql_server_repo_url }}"
+    suites:
+      - "{{ ansible_distribution_release }}"
+    components:
+      - main
+    name: "mssql-server-{{ mssql_version }}"
+    state: present

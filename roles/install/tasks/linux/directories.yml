@@ -1,0 +1,67 @@
+---
+- name: Create SQL Server data directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_data_path }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server log directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_log_path }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server dump directory
+  when:
+    - mssql_database_dump_path != '/var/log'
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_dump_path }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server backup directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ _mssql_database_backup_path }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server master data file directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_master_data_file_path | dirname }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server master log file directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_master_log_file_path | dirname }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'
+
+- name: Create SQL Server error log directory
+  when:
+    - mssql_database_error_log_file_path | dirname != '/var/log'
+  become: true
+  ansible.builtin.file:
+    path: "{{ mssql_database_error_log_file_path | dirname }}"
+    state: directory
+    owner: mssql
+    group: mssql
+    mode: '0750'

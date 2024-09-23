@@ -1,0 +1,5 @@
+---
+_mssql_supported_distributions:
+  - Ubuntu
+
+_mssql_default_database_backup_path: /var/opt/mssql/data

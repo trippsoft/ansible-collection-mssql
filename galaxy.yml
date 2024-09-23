@@ -1,0 +1,34 @@
+---
+namespace: trippsc2
+name: mssql
+version: 1.0.0
+readme: README.md
+authors:
+  - Jim Tarpley
+description: This collection contains modules and roles for installing and configuration Microsoft SQL Server.
+
+license_file: 'LICENSE'
+
+tags: []
+
+dependencies:
+  ansible.posix: '>=1.1.0'
+  ansible.windows: '>=1.0.0'
+  chocolatey.chocolatey: '>=1.2.0'
+  community.general: '>=2.0.0'
+  community.hashi_vault: '>=6.2.0'
+  community.windows: '>=1.0.0'
+  trippsc2.hashi_vault: '>=1.0.0'
+  trippsc2.windows: '>=1.0.0'
+
+repository: https://github.com/trippsc2/ansible-collection-mssql.git
+
+manifest:
+  directives:
+    - recursive-include roles/* *.md
+    - recursive-include roles/*/files **
+    - exclude galaxy.yml galaxy.yaml MANIFEST.json FILES.json *.tar.gz
+    - recursive-exclude tests/output **
+    - recursive-exclude roles/*/molecule **
+    - recursive-exclude molecule **
+    - global-exclude /.* /__pycache__

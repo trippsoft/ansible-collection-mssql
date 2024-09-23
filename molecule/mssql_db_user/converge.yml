@@ -1,0 +1,47 @@
+---
+- name: Converge
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Check if user would be created
+      check_mode: true
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        database: tempdb
+        state: present
+
+    - name: Create user
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        database: tempdb
+        state: present
+
+    - name: Check if user would be removed
+      check_mode: true
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser2
+        database: tempdb
+        state: absent
+
+    - name: Remove user
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser2
+        database: tempdb
+        state: absent

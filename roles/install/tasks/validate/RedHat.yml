@@ -1,0 +1,20 @@
+---
+- name: Validate EL major version
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution_major_version | string in _mssql_supported_major_versions
+    fail_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is not a supported major version."
+    success_msg: "{{ ansible_distribution }} {{ ansible_distribution_major_version }} is supported."
+
+- name: Include EL major version variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}/{{ ansible_distribution_major_version }}.yml"
+
+- name: Validate SQL Server version
+  ansible.builtin.assert:
+    that:
+      - mssql_version | string in _mssql_supported_server_versions
+    fail_msg: "SQL Server version {{ mssql_version }} is not supported on EL {{ ansible_distribution_major_version }}."
+    success_msg: "SQL Server version {{ mssql_version }} is supported on EL {{ ansible_distribution_major_version }}."
+
+- name: Validate Linux-specific variables
+  ansible.builtin.include_tasks: validate/linux.yml

@@ -1,0 +1,16 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: mssql
+    dockerfile: ../common/Dockerfile.j2
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    exposed_ports:
+      - 1433/tcp
+    published_ports:
+      - 0.0.0.0:1433:1433/tcp
+    command: /opt/mssql/bin/sqlservr
+    env:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: SecurePassword123!
+      MSSQL_PID: Developer

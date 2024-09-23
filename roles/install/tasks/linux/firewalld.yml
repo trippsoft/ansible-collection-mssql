@@ -1,0 +1,8 @@
+---
+- name: Allow SQL Server port in firewalld
+  become: true
+  ansible.posix.firewalld:
+    port: "{{ mssql_database_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true

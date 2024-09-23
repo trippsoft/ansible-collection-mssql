@@ -1,0 +1,117 @@
+---
+- name: Prepare
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Pre-create user
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        type: sql
+        password: SecurePassword123!
+        login_password_expiration_enabled: "{{ item.login_password_expiration_enabled | default(omit) }}"
+        login_password_policy_enforced: "{{ item.login_password_policy_enforced | default(omit) }}"
+        state: present
+
+    - name: Pre-create CONNECT SQL permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - connect_sql
+        state: grant
+
+    - name: Pre-create ALTER ANY LOGIN permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_login
+        state: grant
+
+    - name: Pre-create ALTER ANY CONNECTION permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_connection
+        state: grant
+
+    - name: Pre-create ALTER ANY ENDPOINT permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_endpoint
+        state: grant_with_grant_option
+
+    - name: Pre-create ALTER ANY SERVER ROLE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_role
+        state: grant_with_grant_option
+
+    - name: Pre-create ALTER ANY DATABASE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_database
+        state: grant_with_grant_option
+
+    - name: Pre-create ALTER ANY AVAILABILITY GROUP permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_availability_group
+        state: deny
+
+    - name: Pre-create ALTER ANY EVENT SESSION permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_event_session
+        state: deny
+
+    - name: Pre-create ALTER ANY SERVER AUDIT permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_audit
+        state: deny

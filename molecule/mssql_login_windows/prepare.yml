@@ -1,0 +1,99 @@
+---
+- name: Prepare DC
+  hosts:
+    - dc
+  roles:
+    - role: trippsc2.ad.testing_domain_controller
+  tasks:
+    - name: Create AD service account
+      microsoft.ad.user:
+        name: "{{ mssql_active_directory_user }}"
+        password: "{{ mssql_active_directory_password }}"
+        upn: "{{ mssql_active_directory_user }}@test.loc"
+        attributes:
+          set:
+            msDS-SupportedEncryptionTypes: 24
+        spn:
+          set:
+            - MSSQLSvc/linux
+            - MSSQLSvc/linux.test.loc
+            - MSSQLSvc/linux:1433
+            - MSSQLSvc/linux.test.loc:1433
+        state: present
+
+    - name: Install SQL Server Management Studio
+      chocolatey.chocolatey.win_chocolatey:
+        name: sql-server-management-studio
+        state: present
+
+    - name: Create AD accounts
+      loop:
+        - testuser1
+        - existinguser1
+        - existinguser2
+      microsoft.ad.user:
+        name: "{{ item }}"
+        password: SecurePassword123!
+        upn: "{{ item }}@test.loc"
+        state: present
+
+- name: Prepare member server
+  hosts:
+    - linux
+  pre_tasks:
+    - name: Create MSSQL group
+      become: true
+      ansible.builtin.group:
+        name: mssql
+        state: present
+        system: true
+    
+    - name: Create MSSQL user
+      become: true
+      ansible.builtin.user:
+        name: mssql
+        group: mssql
+        password: '!'
+        password_lock: true
+        state: present
+        system: true
+        shell: /usr/sbin/nologin
+        home: /var/opt/mssql
+        createhome: false
+  roles:
+    - role: trippsc2.ad.testing_linux_member
+    - role: trippsc2.hashi_vault.testing_ca
+    - role: trippsc2.hashi_vault.signed_certificate
+      vars:
+        cert_certificate_path: "{{ mssql_database_tls_certificate_path }}"
+        cert_private_key_path: "{{ mssql_database_tls_private_key_path }}"
+        cert_certificate_owner: mssql
+        cert_certificate_group: mssql
+        cert_private_key_owner: mssql
+        cert_private_key_group: mssql
+        cert_common_name: "{{ inventory_hostname }}"
+        cert_subject_alternative_names:
+          - "DNS:{{ inventory_hostname }}"
+          - DNS:localhost
+          - "IP:{{ ansible_host }}"
+          - IP:127.0.0.1
+        cert_copy_ca_chain: true
+    - role: trippsc2.mssql.install
+  tasks:
+    - name: Wait 10 seconds to wait for SQL Server to start
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Pre-create user
+      loop:
+        - existinguser1
+        - existinguser2
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: "TEST\\{{ item }}"
+        type: windows
+        state: present

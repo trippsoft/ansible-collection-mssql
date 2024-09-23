@@ -1,0 +1,37 @@
+---
+- name: Add repositories
+  ansible.builtin.include_tasks: linux/{{ ansible_os_family }}/repo.yml
+
+- name: Configure firewalld
+  when:
+    - mssql_configure_firewall
+    - _mssql_firewall_type == 'firewalld'
+  ansible.builtin.include_tasks: linux/firewalld.yml
+
+- name: Configure ufw
+  when:
+    - mssql_configure_firewall
+    - _mssql_firewall_type == 'ufw'
+  ansible.builtin.include_tasks: linux/ufw.yml
+
+- name: Install
+  ansible.builtin.include_tasks: linux/{{ ansible_os_family }}/install.yml
+
+- name: Create directories
+  ansible.builtin.include_tasks: linux/directories.yml
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure
+  ansible.builtin.include_tasks: linux/configure.yml
+
+- name: Configure monitoring
+  when:
+    - mssql_configure_monitoring
+  ansible.builtin.include_tasks: monitoring.yml
+
+- name: Configure Vault database connection
+  when:
+    - mssql_vault_configure_database_connection
+  ansible.builtin.include_tasks: vault/connection.yml

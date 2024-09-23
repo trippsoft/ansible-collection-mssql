@@ -1,0 +1,120 @@
+---
+- name: Configure SQL Server and SQL Agent 'Adjust memory quotas for a process' permission
+  when:
+    - mssql_install_database_engine
+  ansible.windows.win_user_right:
+    name: SeIncreaseQuotaPrivilege
+    users:
+      - NT SERVICE\MSSQLSERVER
+      - NT SERVICE\SQLSERVERAGENT
+    action: add
+
+- name: Configure named SQL Server account 'Adjust memory quotas for a process' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeIncreaseQuotaPrivilege
+    users:
+      - "{{ mssql_sql_server_service_username }}"
+    action: add
+
+- name: Configure named SQL Agent account 'Adjust memory quotas for a process' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_agent_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeIncreaseQuotaPrivilege
+    users:
+      - "{{ mssql_sql_server_agent_service_username }}"
+    action: add
+
+- name: Configure SQL Server and SQL Agent 'Bypass traverse checking' permission
+  when:
+    - mssql_install_database_engine
+  ansible.windows.win_user_right:
+    name: SeChangeNotifyPrivilege
+    users:
+      - NT SERVICE\MSSQLSERVER
+      - NT SERVICE\SQLSERVERAGENT
+    action: add
+
+- name: Configure named SQL Server account 'Bypass traverse checking' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeChangeNotifyPrivilege
+    users:
+      - "{{ mssql_sql_server_service_username }}"
+    action: add
+
+- name: Configure named SQL Agent account 'Bypass traverse checking' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_agent_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeChangeNotifyPrivilege
+    users:
+      - "{{ mssql_sql_server_agent_service_username }}"
+    action: add
+
+- name: Configure SQL Server and SQL Agent 'Perform volume maintenance tasks' permission
+  when:
+    - mssql_install_database_engine
+  ansible.windows.win_user_right:
+    name: SeManageVolumePrivilege
+    users:
+      - NT SERVICE\MSSQLSERVER
+      - NT SERVICE\SQLSERVERAGENT
+    action: add
+
+- name: Configure named SQL Server account 'Perform volume maintenance tasks' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeManageVolumePrivilege
+    users:
+      - "{{ mssql_sql_server_service_username }}"
+    action: add
+
+- name: Configure named SQL Agent account 'Perform volume maintenance tasks' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_agent_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeManageVolumePrivilege
+    users:
+      - "{{ mssql_sql_server_agent_service_username }}"
+    action: add
+
+- name: Configure SQL Server and SQL Agent 'Replace a process level token' permission
+  when:
+    - mssql_install_database_engine
+  ansible.windows.win_user_right:
+    name: SeAssignPrimaryTokenPrivilege
+    users:
+      - NT SERVICE\MSSQLSERVER
+      - NT SERVICE\SQLSERVERAGENT
+    action: add
+
+- name: Configure named SQL Server account 'Replace a process level token' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeAssignPrimaryTokenPrivilege
+    users:
+      - "{{ mssql_sql_server_service_username }}"
+    action: add
+
+- name: Configure named SQL Agent account 'Replace a process level token' permission
+  when:
+    - mssql_install_database_engine
+    - mssql_sql_server_agent_service_username is defined
+  ansible.windows.win_user_right:
+    name: SeAssignPrimaryTokenPrivilege
+    users:
+      - "{{ mssql_sql_server_agent_service_username }}"
+    action: add

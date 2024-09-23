@@ -1,0 +1,89 @@
+---
+mssql_port: "{{ mssql_database_port }}"
+
+mssql_configure_firewall: true
+mssql_configure_monitoring: false
+
+mssql_vault_manage_monitoring_credentials: false
+mssql_vault_configure_database_connection: false
+mssql_vault_create_secret_engines: true
+
+mssql_install_database_engine: true
+mssql_install_agent: true
+mssql_install_full_text: false
+mssql_install_replication: false
+mssql_install_analysis_services: false
+mssql_install_integration_services: false
+mssql_install_sql_server_management_studio: true
+
+mssql_enable_active_directory_authentication: false
+
+mssql_instance_name: MSSQLSERVER
+mssql_instance_id: "{{ mssql_instance_name | upper }}"
+
+mssql_update_enabled: true
+mssql_update_from_microsoft_update: true
+
+mssql_sqm_reporting: false
+mssql_error_reporting: false
+
+mssql_install_shared_path: C:\Program Files\Microsoft SQL Server
+mssql_install_shared_wow64_path: C:\Program Files (x86)\Microsoft SQL Server
+mssql_instance_path: "{{ mssql_install_shared_path }}"
+
+mssql_named_pipes_enabled: false
+mssql_tcp_enabled: true
+
+mssql_setup_process_timeout_in_seconds: 7200
+
+mssql_skip_reboot: true
+
+mssql_security_mode: mixed
+
+mssql_database_lcid: 1033
+mssql_database_collation: SQL_Latin1_General_CP1_CI_AS
+mssql_as_collation: Latin1_General_CI_AS
+mssql_use_english_setup_locale: true
+
+mssql_database_port: 1433
+
+mssql_database_base_path: "{{ mssql_instance_path }}"
+
+mssql_database_user_db_path: >-
+  {{ mssql_database_base_path }}\MSSQL{{ _mssql_major_version }}.{{ mssql_instance_id }}\MSSQL\Data
+mssql_database_user_db_log_path: "{{ mssql_database_user_db_path }}"
+mssql_database_temp_db_path: "{{ mssql_database_user_db_path }}"
+mssql_database_temp_db_log_path: "{{ mssql_database_user_db_path }}"
+
+mssql_database_data_path: /var/opt/mssql/data
+mssql_database_log_path: /var/opt/mssql/data
+mssql_database_dump_path: /var/log/mssql
+
+mssql_database_master_data_file_path: /var/opt/mssql/data/master.mdf
+mssql_database_master_log_file_path: /var/opt/mssql/data/mastlog.ldf
+mssql_database_error_log_file_path: /var/log/mssql/errorlog
+
+mssql_database_customer_feedback_enabled: false
+
+mssql_active_directory_keytab_path: /var/opt/mssql/secrets/mssql.keytab
+
+mssql_as_data_path: >-
+  {{ mssql_instance_path }}\MSAS{{ _mssql_major_version }}.{{ mssql_instance_id }}\OLAP\Data
+mssql_as_log_path: >-
+  {{ mssql_instance_path }}\MSAS{{ _mssql_major_version }}.{{ mssql_instance_id }}\OLAP\Log
+mssql_as_backup_path: >-
+  {{ mssql_instance_path }}\MSAS{{ _mssql_major_version }}.{{ mssql_instance_id }}\OLAP\Backup
+mssql_as_temp_path: >-
+  {{ mssql_instance_path }}\MSAS{{ _mssql_major_version }}.{{ mssql_instance_id }}\OLAP\Temp
+mssql_as_config_path: >-
+  {{ mssql_instance_path }}\MSAS{{ _mssql_major_version }}.{{ mssql_instance_id }}\OLAP\Config
+
+mssql_as_server_mode: tabular
+
+mssql_vault_database_connection_name: "{{ inventory_hostname }}"
+mssql_vault_database_connection_username: vault
+mssql_vault_database_connection_temporary_password: TemporaryPassword123!
+mssql_vault_database_connection_port: "{{ mssql_database_port }}"
+
+mssql_vault_managed_logins: []
+mssql_password_rotation_period: 5184000

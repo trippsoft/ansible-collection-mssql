@@ -1,0 +1,100 @@
+---
+- name: Install PSGallery from role
+  ansible.builtin.include_role:
+    name: trippsc2.windows.install_psgallery
+  tags:
+    - always
+    - molecule-idempotence-notest
+
+- name: Install SQL Server Powershell module
+  community.windows.win_psmodule:
+    name: SqlServer
+    state: present
+    allow_clobber: true
+
+- name: Install SQL Server DSC module
+  community.windows.win_psmodule:
+    name: SqlServerDsc
+    state: present
+
+- name: Install Visual C++ Redistributable
+  chocolatey.chocolatey.win_chocolatey:
+    name:
+      - vcredist140
+    state: present
+
+- name: Install SQL Server Management Studio
+  when:
+    - mssql_install_sql_server_management_studio
+  chocolatey.chocolatey.win_chocolatey:
+    name:
+      - sql-server-management-studio
+    state: present
+
+- name: Install SQL Server
+  ansible.windows.win_dsc:
+    resource_name: SqlSetup
+    Action: Install
+    SourcePath: "{{ mssql_setup_path }}"
+    SuppressReboot: 'True'
+    ForceReboot: 'False'
+    Features: "{{ _mssql_features | join(',') }}"
+    InstanceName: "{{ mssql_instance_name }}"
+    InstanceId: "{{ mssql_instance_id }}"
+    UpdateEnabled: "{{ mssql_update_enabled | ternary('True', 'False') }}"
+    UpdateSource: "{{ _mssql_update_source }}"
+    SQMReporting: "{{ mssql_sqm_reporting | ternary('True', 'False') }}"
+    ErrorReporting: "{{ mssql_error_reporting | ternary('True', 'False') }}"
+    InstallSharedDir: "{{ mssql_install_shared_path }}"
+    InstallSharedWOWDir: "{{ mssql_install_shared_wow64_path }}"
+    InstanceDir: "{{ mssql_instance_path }}"
+    NpEnabled: "{{ mssql_named_pipes_enabled }}"
+    TcpEnabled: "{{ mssql_tcp_enabled }}"
+    SetupProcessTimeout: "{{ mssql_setup_process_timeout_in_seconds }}"
+    UseEnglish: "{{ mssql_use_english_setup_locale }}"
+    SourceCredential_username: "{{ mssql_setup_access_username | default(omit) }}"
+    SourceCredential_password: "{{ mssql_setup_access_password | default(omit) }}"
+    ProductKey: "{{ mssql_product_key | default(omit) }}"
+    SQLSvcAccount_username: "{{ _mssql_sql_server_service_username }}"
+    SQLSvcAccount_password: "{{ _mssql_sql_server_service_password }}"
+    SqlSvcStartupType: "{{ _mssql_sql_server_service_startup_type }}"
+    AgtSvcAccount_username: "{{ _mssql_sql_server_agent_service_username }}"
+    AgtSvcAccount_password: "{{ _mssql_sql_server_agent_service_password }}"
+    AgtSvcStartupType: "{{ _mssql_sql_server_agent_service_startup_type }}"
+    SQLCollation: "{{ _mssql_database_collation }}"
+    SQLSysAdminAccounts: "{{ _mssql_database_sysadmin_accounts }}"
+    SecurityMode: "{{ _mssql_security_mode }}"
+    SAPwd_username: >-
+      {{ 'sa' if mssql_install_database_engine and mssql_security_mode == 'mixed' else omit }}
+    SAPwd_password: "{{ _mssql_sa_password }}"
+    InstallSQLDataDir: "{{ _mssql_database_base_path }}"
+    SQLUserDBDir: "{{ _mssql_database_user_db_path }}"
+    SQLUserDBLogDir: "{{ _mssql_database_user_db_log_path }}"
+    SQLTempDBDir: "{{ _mssql_database_temp_db_path }}"
+    SQLTempDBLogDir: "{{ _mssql_database_temp_db_log_path }}"
+    SQLBackupDir: "{{ _mssql_database_backup_path }}"
+    FTSvcAccount_username: "{{ _mssql_full_text_filter_daemon_host_username }}"
+    FTSvcAccount_password: "{{ _mssql_full_text_filter_daemon_host_password }}"
+    ASSvcAccount_username: "{{ _mssql_sql_server_analysis_services_username }}"
+    ASSvcAccount_password: "{{ _mssql_sql_server_analysis_services_password }}"
+    AsSvcStartupType: "{{ _mssql_sql_server_analysis_services_startup_type }}"
+    ASCollation: "{{ _mssql_as_collation }}"
+    ASSysAdminAccounts: "{{ _mssql_as_sysadmin_accounts }}"
+    ASDataDir: "{{ _mssql_as_data_path }}"
+    ASLogDir: "{{ _mssql_as_log_path }}"
+    ASBackupDir: "{{ _mssql_as_backup_path }}"
+    ASTempDir: "{{ _mssql_as_temp_path }}"
+    ASConfigDir: "{{ _mssql_as_config_path }}"
+    ASServerMode: "{{ _mssql_as_server_mode }}"
+    SqlTempdbFileCount: "{{ _mssql_as_tempdb_file_count }}"
+    SqlTempdbFileGrowth: "{{ _mssql_as_tempdb_file_growth }}"
+    SqlTempdbLogFileSize: "{{ _mssql_as_tempdb_log_file_size }}"
+    SqlTempdbLogFileGrowth: "{{ _mssql_as_tempdb_log_file_growth }}"
+    ISSvcAccount_username: "{{ _mssql_sql_server_integration_services_username }}"
+    ISSvcAccount_password: "{{ _mssql_sql_server_integration_services_password }}"
+    IsSvcStartupType: "{{ _mssql_sql_server_integration_services_startup_type }}"
+    FailoverClusterGroupName: "{{ mssql_failover_cluster_group_name | default(omit) }}"
+    FailoverClusterIPAddress: "{{ mssql_failover_cluster_ip_address | default(omit) }}"
+    FailoverClusterNetworkName: "{{ mssql_failover_cluster_network_name | default(omit) }}"
+  notify:
+    - _mssql_reboot

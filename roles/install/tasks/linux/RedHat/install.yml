@@ -1,0 +1,90 @@
+---
+- name: Create MSSQL group
+  become: true
+  ansible.builtin.group:
+    name: mssql
+    state: present
+    system: true
+
+- name: Create MSSQL user
+  become: true
+  ansible.builtin.user:
+    name: mssql
+    group: mssql
+    password: '!'
+    password_lock: true
+    state: present
+    system: true
+    shell: /usr/sbin/nologin
+    home: /var/opt/mssql
+    createhome: false
+
+- name: Install SQL Server tools
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - mssql-tools18
+      - unixODBC-devel
+    state: present
+    update_cache: true
+
+- name: Install SQL Server database engine
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - mssql-server
+    state: present
+  notify:
+    - _mssql_configure_database_engine
+
+- name: Install SQL Server Agent
+  when:
+    - mssql_version == '2017'
+    - mssql_install_agent
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - mssql-server-agent
+    state: present
+
+- name: Install SQL Server Full-Text Search
+  when:
+    - mssql_install_full_text
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - mssql-server-fts
+    state: present
+
+- name: Install SQL Server Integration Services
+  when:
+    - mssql_install_integration_services
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - mssql-server-is
+    state: present
+    update_cache: true
+  notify:
+    - _mssql_configure_integration_services
+
+- name: Install SQL Server AD tools
+  when:
+    - mssql_enable_active_directory_authentication
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+  ansible.builtin.dnf:
+    name:
+      - adutil
+    state: present

@@ -1,0 +1,45 @@
+---
+- name: Configure SQL Server Database Engine firewall rule
+  when:
+    - mssql_install_database_engine
+  community.windows.win_firewall_rule:
+    name: "SQL Server Database Engine instance {{ mssql_instance_name }}"
+    action: allow
+    direction: in
+    enabled: true
+    program: "{{ _mssql_sqlservr_exe_path }}"
+    state: present
+
+- name: Configure SQL Server Analysis Services firewall rule
+  when:
+    - mssql_install_analysis_services
+  community.windows.win_firewall_rule:
+    name: "SQL Server Analysis Services instance {{ mssql_instance_name }}"
+    action: allow
+    direction: in
+    enabled: true
+    service: "{{ mssql_instance_name == 'MSSQLSERVER' | ternary('MSSQLServerOLAPService', 'MSOLAP$' + mssql_instance_name) }}"
+    state: present
+
+- name: Configure SQL Server Integration Services application firewall rule
+  when:
+    - mssql_install_integration_services
+  community.windows.win_firewall_rule:
+    name: SQL Server Integration Services Application
+    action: allow
+    direction: in
+    enabled: true
+    program: "{{ _mssql_msdtssrvr_exe_path }}"
+    state: present
+
+- name: Configure SQL Server Integration Services port firewall rule
+  when:
+    - mssql_install_integration_services
+  community.windows.win_firewall_rule:
+    name: SQL Server Integration Services Port
+    action: allow
+    direction: in
+    enabled: true
+    localport: 135
+    protocol: tcp
+    state: present

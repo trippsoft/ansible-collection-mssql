@@ -1,0 +1,73 @@
+---
+- name: Gather OS facts
+  when:
+    - ansible_distribution is not defined or
+      ansible_distribution_release is not defined or
+      ansible_distribution_major_version is not defined or
+      ansible_os_family is not defined
+  ansible.builtin.setup:
+    gather_subset:
+      - '!all'
+      - '!min'
+      - distribution
+      - os_family
+
+- name: Validate OS family
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family in _mssql_supported_os_families
+    fail_msg: "{{ ansible_os_family }} OS family is not supported."
+    success_msg: "{{ ansible_os_family }} OS family is supported.  Checking specifics."
+
+- name: Include OS family variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Validate product key
+  when:
+    - mssql_product_key is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_product_key | regex_search('^[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}-[a-zA-Z0-9]{5}$')
+    fail_msg: "The 'mssql_product_key' variable is not a valid product key format. Please provide a valid product key."
+    success_msg: "The 'mssql_product_key' variable is a valid format."
+
+- name: Validate OS specific variables
+  ansible.builtin.include_tasks: "validate/{{ ansible_os_family }}.yml"
+
+- name: Validate monitoring variables
+  when:
+    - mssql_configure_monitoring
+  block:
+    - name: Validate monitoring user is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_user is defined
+        fail_msg: "The 'mssql_monitoring_user' variable is not defined."
+        success_msg: "The 'mssql_monitoring_user' variable is defined."
+
+    - name: Validate monitoring password is defined
+      when:
+        - not mssql_vault_manage_monitoring_credentials
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_password is defined
+        fail_msg: "The 'mssql_monitoring_password' variable is not defined."
+        success_msg: "The 'mssql_monitoring_password' variable is defined."
+
+- name: Validate Vault database variables
+  when:
+    - mssql_vault_configure_database_connection
+  block:
+    - name: Validate Vault database mount point is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_database_mount_point is defined
+        fail_msg: "The 'mssql_vault_database_mount_point' variable is not defined."
+        success_msg: "The 'mssql_vault_database_mount_point' variable is defined."
+
+    - name: Validate Vault database connection name is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_database_connection_name is defined
+        fail_msg: "The 'mssql_vault_database_connection_name' variable is not defined."
+        success_msg: "The 'mssql_vault_database_connection_name' variable is defined."

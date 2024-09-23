@@ -1,0 +1,164 @@
+---
+- name: Validate HashiCorp Vault monitoring credentials variables
+  when:
+    - mssql_vault_manage_monitoring_credentials
+  block:
+    - name: Validate monitoring mount point is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_monitoring_mount_point is defined
+        fail_msg: "The 'mssql_vault_monitoring_mount_point' variable is not defined."
+        success_msg: "The 'mssql_vault_monitoring_mount_point' variable is defined."
+
+    - name: Validate monitoring secret path is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_vault_monitoring_secret_path is defined
+        fail_msg: "The 'mssql_vault_monitoring_secret_path' variable is not defined."
+        success_msg: "The 'mssql_vault_monitoring_secret_path' variable is defined."
+
+- name: Validate SA password is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_sa_password is defined
+    fail_msg: "The 'mssql_sa_password' variable is not defined."
+    success_msg: "The 'mssql_sa_password' variable is defined."
+
+- name: Validate database port
+  ansible.builtin.assert:
+    that:
+      - mssql_database_port | int > 0
+      - mssql_database_port | int < 65536
+    fail_msg: "The 'mssql_database_port' variable is must be between 1 and 65535. Value: {{ mssql_database_port }}"
+    success_msg: "The 'mssql_database_port' variable is a valid port."
+
+- name: Validate database product edition is defined
+  when:
+    - mssql_product_key is not defined
+  ansible.builtin.assert:
+    that:
+      - mssql_database_edition is defined
+    fail_msg: "The 'mssql_product_edition' variable is not defined."
+    success_msg: "The 'mssql_product_edition' variable is defined."
+
+- name: Valdiate Integration Services product edition is defined
+  when:
+    - mssql_install_integration_services
+    - mssql_product_key is not defined
+  ansible.builtin.assert:
+    that:
+      - mssql_integration_services_edition is defined
+    fail_msg: "The 'mssql_integration_services_edition' variable is not defined."
+    success_msg: "The 'mssql_integration_services_edition' variable is defined."
+
+- name: Validate memory limit
+  when:
+    - mssql_database_memory_limit_in_mb is defined
+  ansible.builtin.assert:
+    that:
+      - mssql_database_memory_limit_in_mb | int > 0
+    fail_msg: "The 'mssql_database_memory_limit_in_mb' variable is not a valid memory limit."
+    success_msg: "The 'mssql_database_memory_limit_in_mb' variable is a valid memory limit."
+
+- name: Validate TLS certificate
+  when:
+    - mssql_database_tls_certificate_path is defined
+  block:
+    - name: Validate TLS private key path is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_database_tls_private_key_path is defined
+        fail_msg: "The 'mssql_database_tls_private_key_path' variable is not defined."
+        success_msg: "The 'mssql_database_tls_private_key_path' variable is defined."
+
+    - name: Check if TLS certificate path is a valid path
+      become: true
+      ansible.builtin.stat:
+        path: "{{ mssql_database_tls_certificate_path }}"
+      register: _mssql_database_tls_certificate
+
+    - name: Validate TLS certificate path is a valid path
+      ansible.builtin.assert:
+        that:
+          - _mssql_database_tls_certificate.stat.exists
+        fail_msg: "'{{ mssql_database_tls_certificate_path }}' is not a valid path."
+        success_msg: "'{{ mssql_database_tls_certificate_path }}' is a valid path."
+    
+    - name: Check if TLS key path is a valid path
+      become: true
+      ansible.builtin.stat:
+        path: "{{ mssql_database_tls_private_key_path }}"
+      register: _mssql_database_tls_private_key
+
+    - name: Validate TLS key path is a valid path
+      ansible.builtin.assert:
+        that:
+          - _mssql_database_tls_private_key.stat.exists
+        fail_msg: "'{{ mssql_database_tls_private_key_path }}' is not a valid path."
+        success_msg: "'{{ mssql_database_tls_private_key_path }}' is a valid path."
+
+- name: Validate AD authentication variables
+  when:
+    - mssql_enable_active_directory_authentication
+  block:
+    - name: Validate AD user is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_user is defined
+        fail_msg: "The 'mssql_active_directory_user' variable is not defined."
+        success_msg: "The 'mssql_active_directory_user' variable is defined."
+
+    - name: Validate AD password is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_password is defined
+        fail_msg: "The 'mssql_active_directory_password' variable is not defined."
+        success_msg: "The 'mssql_active_directory_password' variable is defined."
+
+    - name: Validate AD realm is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_realm is defined
+        fail_msg: "The 'mssql_active_directory_realm' variable is not defined."
+        success_msg: "The 'mssql_active_directory_realm' variable is defined."
+
+    - name: Validate AD keytab path is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_keytab_path is defined
+        fail_msg: "The 'mssql_active_directory_keytab_path' variable is not defined."
+        success_msg: "The 'mssql_active_directory_keytab_path' variable is defined."
+
+    - name: Validate AD admin user is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_admin_username is defined
+        fail_msg: "The 'mssql_active_directory_admin_username' variable is not defined."
+        success_msg: "The 'mssql_active_directory_admin_username' variable is defined."
+
+    - name: Validate AD admin password is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_active_directory_admin_password is defined
+        fail_msg: "The 'mssql_active_directory_admin_password' variable is not defined."
+        success_msg: "The 'mssql_active_directory_admin_password' variable is defined."
+
+- name: Validate monitoring
+  when:
+    - mssql_configure_monitoring
+  block:
+    - name: Validate monitoring user is defined
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_user is defined
+        fail_msg: "The 'mssql_monitoring_user' variable is not defined."
+        success_msg: "The 'mssql_monitoring_user' variable is defined."
+
+    - name: Validate monitoring password is defined
+      when:
+        - not mssql_vault_manage_monitoring_credentials
+      ansible.builtin.assert:
+        that:
+          - mssql_monitoring_password is defined
+        fail_msg: "The 'mssql_monitoring_password' variable is not defined."
+        success_msg: "The 'mssql_monitoring_password' variable is defined."

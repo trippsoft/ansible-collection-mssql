@@ -1,0 +1,281 @@
+---
+- name: Converge
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Check if VIEW ANY DATABASE permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - view_any_database
+        state: grant
+
+    - name: Grant VIEW ANY DATABASE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - view_any_database
+        state: grant
+
+    - name: Check if CREATE ANY DATABASE permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - create_any_database
+        state: deny
+
+    - name: Deny CREATE ANY DATABASE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - create_any_database
+        state: deny
+
+    - name: Check if CREATE AVAILABILITY GROUP permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - create_availability_group
+        state: grant_with_grant_option
+
+    - name: Grant CREATE AVAILABILITY GROUP permission with grant option
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - create_availability_group
+        state: grant_with_grant_option
+
+    - name: Check if ALTER ANY ENDPOINT permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_endpoint
+        state: grant
+
+    - name: Grant ALTER ANY ENDPOINT permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_endpoint
+        state: grant
+
+    - name: Check if ALTER ANY AVAILABILITY GROUP permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_availability_group
+        state: grant
+
+    - name: Grant ALTER ANY AVAILABILITY GROUP permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_availability_group
+        state: grant
+
+    - name: Check if CONNECT SQL permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - connect_sql
+        state: grant_with_grant_option
+
+    - name: Grant CONNECT SQL permission with grant option
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - connect_sql
+        state: grant_with_grant_option
+
+    - name: Check if ALTER ANY EVENT SESSION permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_event_session
+        state: grant_with_grant_option
+
+    - name: Grant ALTER ANY EVENT SESSION permission with grant option
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_event_session
+        state: grant_with_grant_option
+
+    - name: Check if ALTER ANY LOGIN permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_login
+        state: deny
+
+    - name: Deny ALTER ANY LOGIN permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_login
+        state: deny
+
+    - name: Check if ALTER ANY SERVER ROLE permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_role
+        state: deny
+
+    - name: Deny ALTER ANY SERVER ROLE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_role
+        state: deny
+
+    - name: Check if ALTER ANY CONNECTION permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_connection
+        state: revoke
+
+    - name: Revoke ALTER ANY CONNECTION permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_connection
+        state: revoke
+
+    - name: Check if ALTER ANY DATABASE permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_database
+        state: revoke
+
+    - name: Revoke ALTER ANY DATABASE permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_database
+        state: revoke
+
+    - name: Check if ALTER ANY SERVER AUDIT permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_audit
+        state: revoke
+
+    - name: Revoke ALTER ANY SERVER AUDIT permission
+      trippsc2.mssql.mssql_server_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        permissions:
+          - alter_any_server_audit
+        state: revoke

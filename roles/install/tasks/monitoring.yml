@@ -1,0 +1,98 @@
+---
+- name: Configure HashiCorp Vault monitoring credentials
+  when:
+    - mssql_vault_managed_monitoring_credentials
+  ansible.builtin.include_tasks: vault/monitoring.yml
+
+- name: Configure monitoring login
+  delegate_to: localhost
+  trippsc2.mssql.mssql_login:
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    login_user: "{{ mssql_user }}"
+    login_password: "{{ mssql_password }}"
+    name: "{{ mssql_monitoring_user }}"
+    password: "{{ mssql_monitoring_password }}"
+    update_password: on_create
+    state: present
+  retries: 3
+  delay: 10
+
+- name: Provide server permissions to monitoring login
+  delegate_to: localhost
+  trippsc2.mssql.mssql_server_permission:
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    login_user: "{{ mssql_user }}"
+    login_password: "{{ mssql_password }}"
+    principal: "{{ mssql_monitoring_user }}"
+    permissions:
+      - connect_sql
+      - view_any_definition
+      - view_server_state
+    state: grant
+
+- name: Configure monitoring user in msdb database
+  delegate_to: localhost
+  trippsc2.mssql.mssql_db_user:
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    login_user: "{{ mssql_user }}"
+    login_password: "{{ mssql_password }}"
+    name: "{{ mssql_monitoring_user }}"
+    database: msdb
+    state: present
+
+- name: Provide permissions to monitoring user in msdb database
+  delegate_to: localhost
+  trippsc2.mssql.mssql_db_permission:
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    login_user: "{{ mssql_user }}"
+    login_password: "{{ mssql_password }}"
+    principal: "{{ mssql_monitoring_user }}"
+    database: msdb
+    permissions:
+      - connect
+    state: grant
+
+- name: Provide table and function permissions to monitoring user in msdb database
+  loop:
+    - schema: dbo
+      object: sysjobactivity
+      permissions:
+        - select
+    - schema: dbo
+      object: sysjobhistory
+      permissions:
+        - select
+    - schema: dbo
+      object: sysjobs
+      permissions:
+        - select
+    - schema: dbo
+      object: sysjobschedules
+      permissions:
+        - select
+    - schema: dbo
+      object: sysjobservers
+      permissions:
+        - select
+    - schema: dbo
+      object: agent_datetime
+      permissions:
+        - execute
+  delegate_to: localhost
+  trippsc2.mssql.mssql_db_object_permission:
+    login_host: "{{ mssql_host }}"
+    login_port: "{{ mssql_port }}"
+    login_user: "{{ mssql_user }}"
+    login_password: "{{ mssql_password }}"
+    principal: "{{ mssql_monitoring_user }}"
+    database: msdb
+    schema: "{{ item.schema }}"
+    object: "{{ item.object }}"
+    permissions: "{{ item.permissions }}"
+    state: grant
+  loop_control:
+    label: "{{ item.schema }}.{{ item.object }}"

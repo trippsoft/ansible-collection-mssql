@@ -1,0 +1,335 @@
+---
+- name: Converge
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Check if ALTER on sysjobschedules permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - alter
+        state: grant
+
+    - name: Grant ALTER on sysjobschedules permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - alter
+        state: grant
+
+    - name: Check if DELETE on sysjobschedules permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - delete
+        state: deny
+
+    - name: Deny DELETE on sysjobschedules permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - delete
+        state: deny
+
+    - name: Check if SELECT on sysjobschedules permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - select
+        state: grant_with_grant_option
+
+    - name: Grant SELECT on sysjobschedules permission with grant option
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        schema: dbo
+        object: sysjobschedules
+        permissions:
+          - select
+        state: grant_with_grant_option
+
+    - name: Check if ALTER on sysjobhistory permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - alter
+        state: grant
+
+    - name: Grant ALTER on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - alter
+        state: grant
+
+    - name: Check if ALTER on sysjobs permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - alter
+        state: grant
+
+    - name: Grant ALTER on sysjobs permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - alter
+        state: grant
+
+    - name: Check if ALTER on sysjobactivity permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - alter
+        state: grant_with_grant_option
+
+    - name: Grant ALTER on sysjobactivity permission with grant option
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - alter
+        state: grant_with_grant_option
+
+    - name: Check if DELETE on sysjobs permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - delete
+        state: grant_with_grant_option
+
+    - name: Grant DELETE on sysjobs permission with grant option
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - delete
+        state: grant_with_grant_option
+
+    - name: Check if DELETE on sysjobactivity permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - delete
+        state: deny
+
+    - name: Deny DELETE on sysjobactivity permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - delete
+        state: deny
+
+    - name: Check if DELETE on sysjobhistory permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - delete
+        state: deny
+
+    - name: Deny DELETE on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - delete
+        state: deny
+
+    - name: Check if SELECT on sysjobactivity permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - select
+        state: revoke
+
+    - name: Revoke SELECT on sysjobactivity permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - select
+        state: revoke
+
+    - name: Check if SELECT on sysjobhistory permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - select
+        state: revoke
+
+    - name: Revoke SELECT on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - select
+        state: revoke
+
+    - name: Check if SELECT on sysjobs permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - select
+        state: revoke
+
+    - name: Revoke SELECT on sysjobs permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - select
+        state: revoke

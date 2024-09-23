@@ -1,0 +1,305 @@
+---
+- name: Converge
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Check if VIEW DATABASE STATE permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_database_state
+        state: grant
+
+    - name: Grant VIEW DATABASE STATE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_database_state
+        state: grant
+
+    - name: Check if VIEW ANY COLUMN ENCRYPTION KEY DEFINITION permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_any_column_encryption_key_definition
+        state: deny
+
+    - name: Deny VIEW ANY COLUMN ENCRYPTION KEY DEFINITION permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_any_column_encryption_key_definition
+        state: deny
+
+    - name: Check if VIEW DEFINITION permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_definition
+        state: grant_with_grant_option
+
+    - name: Grant VIEW DEFINITION permission with grant option
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - view_definition
+        state: grant_with_grant_option
+
+    - name: Check if CREATE SERVICE permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_service
+        state: grant
+
+    - name: Grant CREATE SERVICE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_service
+        state: grant
+
+    - name: Check if ALTER ANY SERVICE permission would be granted
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_service
+        state: grant
+
+    - name: Grant ALTER ANY SERVICE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_service
+        state: grant
+
+    - name: Check if CREATE ROLE permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_role
+        state: grant_with_grant_option
+
+    - name: Grant CREATE ROLE permission with grant option
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_role
+        state: grant_with_grant_option
+
+    - name: Check if ALTER ANY SCHEMA permission would be granted with grant option
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_schema
+        state: grant_with_grant_option
+
+    - name: Grant ALTER ANY SCHEMA permission with grant option
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_schema
+        state: grant_with_grant_option
+
+    - name: Check if CREATE ROUTE permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_route
+        state: deny
+
+    - name: Deny CREATE ROUTE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_route
+        state: deny
+
+    - name: Check if CREATE TABLE permission would be denied
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_table
+        state: deny
+
+    - name: Deny CREATE TABLE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_table
+        state: deny
+
+    - name: Check if CREATE RULE permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_rule
+        state: revoke
+
+    - name: Revoke CREATE RULE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_rule
+        state: revoke
+
+    - name: Check if CREATE SCHEMA permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_schema
+        state: revoke
+
+    - name: Revoke CREATE SCHEMA permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_schema
+        state: revoke
+
+    - name: Check if ALTER ANY ROLE permission would be revoked
+      check_mode: true
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_role
+        state: revoke
+
+    - name: Revoke ALTER ANY ROLE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_role
+        state: revoke

@@ -1,0 +1,61 @@
+---
+- name: Create Vault database mount point
+  when:
+    - mssql_vault_create_secret_engines
+  delegate_to: localhost
+  trippsc2.hashi_vault.vault_database_secret_engine:
+    token: "{{ vault_token | default(omit) }}"
+    url: "{{ vault_url | default(omit) }}"
+    engine_mount_point: "{{ mssql_vault_database_mount_point }}"
+    state: present
+
+- name: Configure Vault database connection
+  block:
+    - name: Check for Vault database connection
+      delegate_to: localhost
+      community.hashi_vault.vault_database_connection_read:
+        token: "{{ vault_token | default(omit) }}"
+        url: "{{ vault_url | default(omit) }}"
+        engine_mount_point: "{{ mssql_vault_database_mount_point }}"
+        connection_name: "{{ mssql_vault_database_connection_name }}"
+  rescue:
+    - name: Create Hashicorp Vault user
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ mssql_host }}"
+        login_port: "{{ mssql_port }}"
+        login_user: "{{ mssql_user }}"
+        login_password: "{{ mssql_password }}"
+        name: "{{ mssql_vault_database_connection_username }}"
+        password: "{{ mssql_vault_database_connection_temporary_password }}"
+        state: present
+      retries: 3
+      delay: 10
+
+    - name: Provide permissions to HashiCorp Vault user
+      delegate_to: localhost
+      trippsc2.mssql.mssql_server_permission:
+        login_host: "{{ mssql_host }}"
+        login_port: "{{ mssql_port }}"
+        login_user: "{{ mssql_user }}"
+        login_password: "{{ mssql_password }}"
+        principal: "{{ mssql_vault_database_connection_username }}"
+        permissions:
+          - connect_sql
+          - alter_any_login
+        state: grant
+
+    - name: Configure Vault database connection
+      delegate_to: localhost
+      community.hashi_vault.vault_database_connection_configure:
+        token: "{{ vault_token | default(omit) }}"
+        url: "{{ vault_url | default(omit) }}"
+        engine_mount_point: "{{ mssql_vault_database_mount_point }}"
+        connection_name: "{{ mssql_vault_database_connection_name }}"
+        plugin_name: mssql-database-plugin
+        connection_url: >-
+          sqlserver://{{ '{{username}}' }}:{{ '{{password}}' }}@{{ mssql_vault_database_connection_hostname }}:{{ mssql_vault_database_connection_port }}
+        allowed_roles:
+          - '*'
+        connection_username: "{{ mssql_vault_database_connection_username }}"
+        connection_password: "{{ mssql_vault_database_connection_temporary_password }}"

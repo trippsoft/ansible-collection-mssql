@@ -1,0 +1,9 @@
+---
+_mssql_supported_server_versions:
+  - '2019'
+  - '2022'
+
+_mssql_prod_repo_url: https://packages.microsoft.com/ubuntu/20.04/prod
+
+_mssql_server_repo_url: >-
+  https://packages.microsoft.com/ubuntu/20.04/mssql-server-{{ mssql_version }}

@@ -1,0 +1,60 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+  cachier: machine
+  parallel: true
+platforms:
+  - name: dc
+    box: jtarpley/w2022_cis
+    memory: 2048
+    cpus: 2
+    groups:
+      - windows
+      - windows_domain
+    provider_options:
+      default_prefix: mssql_install_linux_
+  - name: linux
+    box: jtarpley/${MOLECULE_BOX:-rocky8_cis}
+    memory: 4096
+    cpus: 2
+    groups:
+      - subjects
+    provider_options:
+      default_prefix: mssql_login_windows_
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        mssql_active_directory_user: svcsql
+        mssql_active_directory_password: SecurePassword123!
+        vault_token: 47542cbc-6bf8-4fba-8eda-02e0a0d29a0a
+        vault_url: "http://{{ hostvars['linux'].ansible_host }}:8200"
+      subjects:
+        _cert_base_path: >-
+          {{ '/etc/pki/tls/certs' if ansible_os_family == 'RedHat' else '/etc/ssl/certs' }}
+        _key_base_path: >-
+          {{ '/etc/pki/tls/private' if ansible_os_family == 'RedHat' else '/etc/ssl/private' }}
+        mssql_enable_active_directory_authentication: true
+        mssql_version: ${MOLECULE_MSSQL_VERSION:-2022}
+        mssql_database_edition: developer
+        mssql_integration_edition: developer
+        mssql_sa_password: SecurePassword123!
+        mssql_active_directory_admin_username: vagrant
+        mssql_active_directory_realm: TEST.LOC
+        mssql_active_directory_admin_password: vagrant
+        mssql_database_force_encryption: false
+        mssql_database_tls_certificate_path: "{{ _cert_base_path }}/mssql.pem"
+        mssql_database_tls_private_key_path: "{{ _key_base_path }}/mssql.key"
+        mssql_database_tls_protocols:
+          - 1.2
+      windows:
+        ansible_shell_type: powershell
+        ansible_become_method: runas
+        ansible_become_user: SYSTEM
+verifier:
+  name: ansible

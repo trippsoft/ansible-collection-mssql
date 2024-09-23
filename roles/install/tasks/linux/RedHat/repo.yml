@@ -1,0 +1,30 @@
+---
+- name: Import RPM key
+  become: true
+  ansible.builtin.rpm_key:
+    key: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add Microsoft SQL common repository
+  become: true
+  ansible.builtin.yum_repository:
+    file: mssql-release
+    name: packages-microsoft-com-prod
+    description: packages-microsoft-com-prod
+    baseurl: "{{ _mssql_prod_repo_url }}"
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    state: present
+
+- name: Add Microsoft SQL Server repository
+  become: true
+  ansible.builtin.yum_repository:
+    file: "mssql-server-{{ mssql_version }}"
+    name: "packages-microsoft-com-mssql-server-{{ mssql_version }}"
+    description: "packages-microsoft-com-mssql-server-{{ mssql_version }}"
+    baseurl: "{{ _mssql_server_repo_url }}"
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://packages.microsoft.com/keys/microsoft.asc
+    state: present

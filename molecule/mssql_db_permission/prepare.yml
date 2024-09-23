@@ -1,0 +1,136 @@
+---
+- name: Prepare
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Pre-create user
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        type: sql
+        password: SecurePassword123!
+        login_password_expiration_enabled: "{{ item.login_password_expiration_enabled | default(omit) }}"
+        login_password_policy_enforced: "{{ item.login_password_policy_enforced | default(omit) }}"
+        state: present
+
+    - name: Pre-create database user
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        database: tempdb
+        state: present
+
+    - name: Pre-create CREATE ROLE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_role
+        state: grant
+
+    - name: Pre-create CREATE ROUTE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_route
+        state: grant
+
+    - name: Pre-create CREATE RULE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_rule
+        state: grant
+
+    - name: Pre-create CREATE SERVICE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_service
+        state: grant_with_grant_option
+
+    - name: Pre-create CREATE TABLE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_table
+        state: grant_with_grant_option
+
+    - name: Pre-create CREATE SCHEMA permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - create_schema
+        state: grant_with_grant_option
+
+    - name: Pre-create ALTER ANY SERVICE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_service
+        state: deny
+
+    - name: Pre-create ALTER ANY SCHEMA permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_schema
+        state: deny
+
+    - name: Pre-create ALTER ANY ROLE permission
+      trippsc2.mssql.mssql_db_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: tempdb
+        permissions:
+          - alter_any_role
+        state: deny

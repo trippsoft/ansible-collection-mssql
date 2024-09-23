@@ -1,0 +1,115 @@
+---
+- name: Converge
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Check if user would be created
+      check_mode: true
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        type: sql
+        password: SecurePassword123!
+        update_password: on_create
+        login_password_expiration_enabled: false
+        login_password_policy_enforced: false
+        state: present
+
+    - name: Create user
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        type: sql
+        password: SecurePassword123!
+        update_password: on_create
+        login_password_expiration_enabled: false
+        login_password_policy_enforced: false
+        state: present
+
+    - name: Check if user would be removed
+      check_mode: true
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser1
+        state: absent
+
+    - name: Remove user
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser1
+        state: absent
+
+    - name: Check if user would be changed
+      check_mode: true
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser2
+        type: sql
+        enabled: false
+        password: SecurePassword123!
+        update_password: on_create
+        login_password_expiration_enabled: true
+        login_password_policy_enforced: true
+        state: present
+
+    - name: Check if user would be changed
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser2
+        type: sql
+        enabled: false
+        password: SecurePassword123!
+        update_password: on_create
+        login_password_expiration_enabled: true
+        login_password_policy_enforced: true
+        state: present
+
+    - name: Check if password would be changed
+      check_mode: true
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser3
+        type: sql
+        password: SecurePassword123!
+        update_password: always
+        state: present
+      tags:
+        - always
+        - molecule-idempotence-notest
+
+    - name: Change password
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: existinguser3
+        type: sql
+        password: SecurePassword123!
+        update_password: always
+        state: present
+      tags:
+        - always
+        - molecule-idempotence-notest

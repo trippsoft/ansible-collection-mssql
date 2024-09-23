@@ -1,0 +1,235 @@
+---
+- name: Configure SQL Agent
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: sqlagent
+    option: enabled
+    value: "{{ mssql_install_agent | lower }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure locale
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: language
+    option: lcid
+    value: "{{ mssql_database_lcid }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure port
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: network
+    option: tcpport
+    value: "{{ mssql_database_port }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure default backup directory
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: filelocation
+    option: defaultbackupdir
+    value: "{{ _mssql_database_backup_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure default data directory
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: filelocation
+    option: defaultdatadir
+    value: "{{ mssql_database_data_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure default log directory
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: filelocation
+    option: defaultlogdir
+    value: "{{ mssql_database_log_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure default dump directory
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: filelocation
+    option: defaultdumpdir
+    value: "{{ mssql_database_dump_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure error log file path
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: filelocation
+    option: errorlogfile
+    value: "{{ mssql_database_error_log_file_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure memory limit
+  when:
+    - mssql_database_memory_limit_in_mb is defined
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: memory
+    option: memorylimitmb
+    value: "{{ mssql_database_memory_limit_in_mb }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure customer feedback
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: telemetry
+    option: customerfeedback
+    value: "{{ mssql_database_customer_feedback_enabled | lower }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure TLS encryption enforcement
+  when:
+    - mssql_database_tls_force_encryption is defined
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: network
+    option: forceencryption
+    value: "{{ mssql_database_tls_force_encryption | ternary('1', '0') }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure TLS certificate path
+  when:
+    - mssql_database_tls_certificate_path is defined
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: network
+    option: tlscert
+    value: "{{ mssql_database_tls_certificate_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure TLS key path
+  when:
+    - mssql_database_tls_private_key_path is defined
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: network
+    option: tlskey
+    value: "{{ mssql_database_tls_private_key_path }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure TLS versions
+  when:
+    - mssql_database_tls_protocols is defined
+  become: true
+  community.general.ini_file:
+    path: /var/opt/mssql/mssql.conf
+    section: network
+    option: tlsprotocols
+    value: "{{ mssql_database_tls_protocols | join(',') }}"
+    owner: mssql
+    group: mssql
+    mode: '0644'
+  notify: _mssql_restart_mssql-server
+
+- name: Configure Active Directory authentication
+  when:
+    - mssql_enable_active_directory_authentication
+  block:
+    - name: Authenticate with Kerberos
+      become: true
+      become_user: mssql
+      ansible.builtin.expect:
+        command: "kinit {{ mssql_active_directory_admin_username }}@{{ mssql_active_directory_realm }}"
+        responses:
+          Password for *: "{{ mssql_active_directory_admin_password }}"
+      changed_when: false
+
+    - name: Create keytab file
+      become: true
+      become_user: mssql
+      environment:
+        MSSQL_CONF_PASSWORD: "{{ mssql_active_directory_password }}"
+      ansible.builtin.command:
+        cmd: "/opt/mssql/bin/mssql-conf -n setup-ad-keytab {{ mssql_active_directory_keytab_path }} {{ mssql_active_directory_user }}"
+        creates: "{{ mssql_active_directory_keytab_path }}"
+      notify: _mssql_restart_mssql-server
+
+    - name: Configure Active Directory keytab path
+      become: true
+      community.general.ini_file:
+        path: /var/opt/mssql/mssql.conf
+        section: network
+        option: kerberoskeytabfile
+        value: "{{ mssql_active_directory_keytab_path }}"
+        owner: mssql
+        group: mssql
+        mode: '0644'
+      notify: _mssql_restart_mssql-server
+
+    - name: Configure Active Directory user
+      become: true
+      community.general.ini_file:
+        path: /var/opt/mssql/mssql.conf
+        section: network
+        option: privilegedadaccount
+        value: "{{ mssql_active_directory_user }}"
+        owner: mssql
+        group: mssql
+        mode: '0644'
+      notify: _mssql_restart_mssql-server
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure SQL Server service is running and enabled
+  become: true
+  ansible.builtin.systemd_service:
+    name: mssql-server.service
+    state: started
+    enabled: true

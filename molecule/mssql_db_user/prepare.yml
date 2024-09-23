@@ -1,0 +1,29 @@
+---
+- name: Prepare
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Pre-create user
+      loop:
+        - testuser1
+        - testuser2
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: "{{ item }}"
+        type: sql
+        password: SecurePassword123!
+        state: present
+
+    - name: Pre-create database user
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser2
+        database: tempdb
+        state: present

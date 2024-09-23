@@ -1,0 +1,852 @@
+---
+argument_specs:
+  main:
+    short_description: Microsoft SQL Server Install
+    description:
+      - This role installs Microsoft SQL Server.
+    author:
+      - Jim Tarpley
+    options:
+      mssql_host:
+        type: str
+        required: true
+        description:
+          - The hostname used to connect to the SQL Server instance for configuration.
+      mssql_port:
+        type: int
+        required: false
+        default: "{{ mssql_database_port }}"
+        description:
+          - The port used to connect to the SQL Server instance for configuration.
+      mssql_user:
+        type: str
+        required: true
+        description:
+          - The username used to connect to the SQL Server instance for configuration.
+      mssql_password:
+        type: str
+        required: true
+        no_log: true
+        description:
+          - The password used to connect to the SQL Server instance for configuration.
+      vault_url:
+        type: str
+        required: false
+        description:
+          - The URL for accessing HashiCorp Vault.
+          - Alternatively, this can be configured through ansible.cfg or environment variables.
+      vault_token:
+        type: str
+        required: false
+        description:
+          - The token for accessing HashiCorp Vault.
+          - Alternatively, this (or any other authentication method) can be configured through ansible.cfg or environment variables.
+      mssql_configure_firewall:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to configure the host firewall for the SQL Server instance.
+      mssql_configure_monitoring:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to configure monitoring for the SQL Server instance.
+      mssql_vault_manage_monitoring_credentials:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to manage the monitoring password in HashiCorp Vault.
+          - If *mssql_configure_monitoring* is `false`, this is ignored.
+      mssql_vault_configure_database_connection:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to configure the database connection in HashiCorp Vault.
+      mssql_vault_create_secret_engines:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to create the secret engines in HashiCorp Vault.
+      mssql_install_database_engine:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to install the `SQL Server Database Engine` feature.
+          - On Linux, this is ignored as it is required for any SQL Server component.
+      mssql_install_agent:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to install the `SQL Server Agent` feature.
+          - On Windows, this is ignored as it is included with the `SQL Server Database Engine` feature automatically.
+          - On Linux, this will enable SQL Server Agent in the configuration.
+          - For SQL Server on Linux 2017, this will also install the separate `mssql-server-agent` package.
+      mssql_install_full_text:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to install the `Full-Text and Semantic Extractions for Search` feature.
+          - If *mssql_install_database_engine* is `false`, this must be set to `false`.
+      mssql_install_replication:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to install the `Replication` feature.
+          - If *mssql_install_database_engine* is `false`, this must be set to `false`.
+          - On Linux, this is ignored as it is included with the `SQL Server Database Engine` feature automatically.
+      mssql_install_analysis_services:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to install the `Analysis Services` feature.
+          - On Linux, this is ignored as this feature is not available.
+      mssql_install_integration_services:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to install the `Integration Services` feature.
+      mssql_install_sql_server_management_studio:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to install SQL Server Management Studio.
+          - On Linux, this is ignored as this feature is not available.
+      mssql_sa_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the `sa` account.
+          - On Linux, this is required.
+          - On Windows, if *mssql_security_mode* is `windows` this is ignored. Otherwise, this is required.
+      mssql_version:
+        type: str
+        required: true
+        choices:
+          - '2016'
+          - '2017'
+          - '2019'
+          - '2022'
+        description:
+          - The version of the SQL Server to install.
+          - On Linux, this will be validated against the distribution release for compatibility.
+          - On Windows, this must match the version of the installation media.  This will not be validated.
+      mssql_firewall_type:
+        type: str
+        required: false
+        choices:
+          - firewalld
+          - ufw
+        description:
+          - The type of firewall to configure on Linux systems.
+          - On Windows, this is ignored.
+          - On EL systems, this defaults to `firewalld`.
+          - On Ubuntu systems, this defaults to `ufw`.
+      mssql_database_port:
+        type: int
+        required: false
+        default: 1433
+        description:
+          - The port for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_product_key:
+        type: str
+        required: false
+        description:
+          - The product key to use for the SQL Server installation.
+          - On Linux, if *mssql_edition* is not defined, this is required.
+          - On Windows, if the installation media is not pre-activated, this is required.
+      mssql_database_edition:
+        type: str
+        required: false
+        choices:
+          - evaluation
+          - developer
+          - express
+          - web
+          - standard
+          - enterprise
+          - enterprise_core
+        description:
+          - The edition of the SQL Server to install.
+          - On Linux, if *mssql_product_key* is not defined, this is required.  Otherwise, this is ignored.
+          - On Windows, this is ignored and the edition is determined by the installation media.
+      mssql_integration_edition:
+        type: str
+        required: false
+        choices:
+          - evaluation
+          - developer
+          - express
+          - web
+          - standard
+          - enterprise
+        description:
+          - The edition of the SQL Server to install for SSIS.
+          - If *mssql_install_integration_services* is `false`, this is ignored.
+          - On Linux, if *mssql_install_integration_services* is `true` and *mssql_product_key* is not defined, this is required.  Otherwise, this is ignored.
+          - On Windows, this is ignored and the edition is determined by the installation media.
+      mssql_database_lcid:
+        type: int
+        required: false
+        default: 1033
+        description:
+          - The locale ID to use for the SQL Server setup process.
+          - On Windows, this is ignored.
+          - 'Reference: https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-fulltext-languages-transact-sql?view=sql-server-ver16'
+      mssql_use_english_setup_locale:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to use the English locale for the SQL Server setup process.
+          - On Linux, this is ignored.
+      mssql_database_default_collation:
+        type: str
+        required: false
+        default: SQL_Latin1_General_CP1_CI_AS
+        description:
+          - The default collation for the SQL Server instance.
+      mssql_as_collation:
+        type: str
+        required: false
+        default: Latin1_General_CI_AS
+        description:
+          - The collation for the SQL Server Analysis Services instance.
+          - If *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_database_backup_path:
+        type: path
+        required: false
+        description:
+          - The path to the SQL Server backup directory.
+          - On Linux, this defaults to `/var/opt/mssql/data`.
+          - On Windows, this defaults to `<*mssql_instance_path*>\MSSQL<MSSQL-version>.<*mssql_instance_id*>\MSSQL\Backup`.
+      mssql_database_data_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/data
+        description:
+          - The path to the SQL Server DB data directory.
+          - On Windows, this is ignored.
+      mssql_database_log_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/data
+        description:
+          - The path to the SQL Server DB log directory.
+          - On Windows, this is ignored.
+      mssql_database_dump_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/log
+        description:
+          - The path to the SQL Server dump directory.
+          - On Windows, this is ignored.
+      mssql_database_master_data_file_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/data/master.mdf
+        description:
+          - The path to the SQL Server master data file.
+          - On Windows, this is ignored.
+      mssql_database_master_log_file_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/data/mastlog.ldf
+        description:
+          - The path to the SQL Server master log file.
+          - On Windows, this is ignored.
+      mssql_database_error_log_file_path:
+        type: path
+        required: false
+        description:
+          - The path to the SQL Server error log file.
+          - On Windows, this is ignored.
+      mssql_database_memory_limit_in_mb:
+        type: int
+        required: false
+        description:
+          - The memory limit for the SQL Server instance.
+          - This defaults to 80% of the total system memory.
+          - On Windows, this is ignored.
+      mssql_database_customer_feedback_enabled:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to enable customer feedback for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_database_tls_force_encryption:
+        type: bool
+        required: false
+        description:
+          - Whether to force encryption for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_database_tls_certificate_path:
+        type: path
+        required: false
+        description:
+          - The path to the TLS certificate for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_database_tls_private_key_path:
+        type: path
+        required: false
+        description:
+          - The path to the TLS private key for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_database_tls_protocols:
+        type: list
+        required: false
+        default:
+          - '1.2'
+        elements: str
+        choices:
+          - '1.0'
+          - '1.1'
+          - '1.2'
+        description:
+          - The TLS protocols to enable for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_enable_active_directory_authentication:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to enable Active Directory authentication for the SQL Server instance.
+          - On Windows, this is ignored.
+      mssql_security_mode:
+        type: str
+        required: false
+        default: mixed
+        choices:
+          - mixed
+          - windows
+        description:
+          - The security mode for the SQL Server instance.
+          - On Linux, this is ignored.
+      mssql_active_directory_user:
+        type: str
+        required: false
+        description:
+          - The Active Directory user account to use for SQL Server authentication.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_active_directory_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the Active Directory user account.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_active_directory_realm:
+        type: str
+        required: false
+        description:
+          - The Active Directory realm to use for SQL Server authentication.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_active_directory_keytab_path:
+        type: path
+        required: false
+        default: /var/opt/mssql/secrets/mssql.keytab
+        description:
+          - The path to the Active Directory keytab file.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_active_directory_admin_username:
+        type: str
+        required: false
+        description:
+          - The Active Directory admin user used to create the keytab.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_active_directory_admin_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the Active Directory admin user.
+          - On Linux, if *mssql_enable_active_directory_authentication* is `true`, this is required.
+          - On Windows, this is ignored.
+      mssql_setup_path:
+        type: path
+        required: false
+        description:
+          - The path to the SQL Server setup executable.
+          - On Linux, this is ignored.
+          - On Windows, this is required.
+      mssql_setup_access_username:
+        type: str
+        required: false
+        description:
+          - The username used to access the SQL Server setup executable, if required.
+          - On Linux, this is ignored.
+      mssql_setup_access_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password used to access the SQL Server setup executable, if required.
+          - On Linux, this is ignored.
+      mssql_instance_name:
+        type: str
+        required: false
+        default: MSSQLSERVER
+        description:
+          - The friendly name of the SQL Server instance to install.
+          - On Linux, this is ignored.
+      mssql_instance_id:
+        type: str
+        required: false
+        description:
+          - The ID of the SQL Server instance to install.
+          - This defaults to the uppercase value of *mssql_instance_name*.
+          - On Linux, this is ignored.
+      mssql_update_enabled:
+        type: bool
+        default: true
+        required: false
+        description:
+          - Whether the SQL Server software should be updated during the installation process.
+          - On Linux, this is ignored.
+      mssql_update_from_microsoft_update:
+        type: bool
+        default: true
+        required: false
+        description:
+          - Whether to update the SQL Server software from Microsoft Update.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_update_enabled* is `false`, this is ignored.
+      mssql_update_source:
+        type: str
+        default: MU
+        required: false
+        description:
+          - The source of the SQL Server software updates.
+          - This should be a UNC path or URI to the location of the updates.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_update_enabled* is `false` or *mssql_update_from_microsoft_update* is `true`, this is ignored.
+      mssql_sqm_reporting:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to enable SQL Server Customer Experience Improvement Program (CEIP) reporting.
+          - On Linux, this is ignored.
+      mssql_error_reporting:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to enable SQL Server error reporting.
+          - On Linux, this is ignored.
+      mssql_install_shared_path:
+        type: str
+        required: false
+        default: C:\Program Files\Microsoft SQL Server
+        description:
+          - The path where the SQL Server shared components will be installed.
+          - On Linux, this is ignored.
+      mssql_install_shared_wow64_path:
+        type: str
+        required: false
+        default: C:\Program Files (x86)\Microsoft SQL Server
+        description:
+          - The path where the SQL Server shared components will be installed on 64-bit systems.
+          - On Linux, this is ignored.
+      mssql_instance_path:
+        type: str
+        required: false
+        default: "{{ mssql_install_shared_path }}"
+        description:
+          - The path where the SQL Server instance will be installed.
+          - On Linux, this is ignored.
+      mssql_named_pipes_enabled:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Whether to enable named pipes for the SQL Server instance.
+          - On Linux, this is ignored.
+      mssql_tcp_enabled:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to enable TCP/IP for the SQL Server instance.
+          - On Linux, this is ignored.
+      mssql_setup_process_timeout_in_seconds:
+        type: int
+        required: false
+        default: 7200
+        description:
+          - The number of seconds to wait for the SQL Server setup process to complete.
+          - On Linux, this is ignored.
+      mssql_sql_server_service_username:
+        type: str
+        required: false
+        description:
+          - The username for the SQL Server service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_sql_server_service_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the SQL Server service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_sql_server_service_startup_type:
+        type: str
+        required: false
+        choices:
+          - Automatic
+          - Manual
+          - Disabled
+        description:
+          - The startup type for the SQL Server service.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_sql_server_agent_service_username:
+        type: str
+        required: false
+        description:
+          - The username for the SQL Server Agent service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_sql_server_agent_service_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the SQL Server Agent service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_sql_server_agent_service_startup_type:
+        type: str
+        required: false
+        choices:
+          - Automatic
+          - Manual
+          - Disabled
+        description:
+          - The startup type for the SQL Server Agent service.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_database_sysadmin_accounts:
+        type: list
+        required: false
+        elements: str
+        description:
+          - The list of accounts to add to the SQL Server sysadmin role.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_database_user_db_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSSQL<version-string>.{{ mssql_instance_id }}\\MSSQL\\Data"
+        description:
+          - The path to the SQL Server data directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_database_user_db_log_path:
+        type: path
+        required: false
+        default: "{{ mssql_database_user_db_path }}"
+        description:
+          - The path to the SQL Server user database log directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_database_temp_db_path:
+        type: path
+        required: false
+        default: "{{ mssql_database_user_db_path }}"
+        description:
+          - The path to the SQL Server tempdb directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_database_temp_db_log_path:
+        type: path
+        required: false
+        default: "{{ mssql_database_user_db_path }}"
+        description:
+          - The path to the SQL Server tempdb log directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_database_engine* is `false`, this is ignored.
+      mssql_full_text_filter_daemon_host_username:
+        type: str
+        required: false
+        description:
+          - The username for the SQL Server Full-Text Filter Daemon Launcher service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_full_text* is `false`, this is ignored.
+      mssql_full_text_filter_daemon_host_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the SQL Server Full-Text Filter Daemon Launcher service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_full_text* is `false`, this is ignored.
+      mssql_sql_server_analysis_services_username:
+        type: str
+        required: false
+        description:
+          - The username for the SQL Server Analysis Services service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_sql_server_analysis_services_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the SQL Server Analysis Services service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_sql_server_analysis_services_startup_type:
+        type: str
+        required: false
+        choices:
+          - Automatic
+          - Manual
+          - Disabled
+        description:
+          - The startup type of SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_sysadmin_accounts:
+        type: list
+        required: false
+        elements: str
+        description:
+          - The list of accounts to add to the SQL Server Analysis Services sysadmin role.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_as_data_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSAS<version-string>.{{ mssql_instance_id }}\\OLAP\\Data"
+        description:
+          - The path to the SQL Server Analysis Services data directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_log_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSAS<version-string>.{{ mssql_instance_id }}\\OLAP\\Log"
+        description:
+          - The path to the SQL Server Analysis Services log directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_backup_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSAS<version-string>.{{ mssql_instance_id }}\\OLAP\\Backup"
+        description:
+          - The path to the SQL Server Analysis Services backup directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_temp_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSAS<version-string>.{{ mssql_instance_id }}\\OLAP\\Temp"
+        description:
+          - The path to the SQL Server Analysis Services temp directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_config_path:
+        type: path
+        required: false
+        default: "{{ mssql_instance_path }}\\MSAS<version-string>.{{ mssql_instance_id }}\\OLAP\\Config"
+        description:
+          - The path to the SQL Server Analysis Services config directory.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_server_mode:
+        type: str
+        required: false
+        default: Tabular
+        choices:
+          - multidimensional
+          - tabular
+          - powerpivot
+        description:
+          - The server mode for the SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_tempdb_file_count:
+        type: int
+        required: false
+        default: 8
+        description:
+          - The number of tempdb files for the SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_tempdb_file_growth:
+        type: int
+        required: false
+        default: 64
+        description:
+          - The size of the tempdb files for the SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_tempdb_log_file_size:
+        type: int
+        required: false
+        default: 8
+        description:
+          - The size of the tempdb log file for the SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_as_tempdb_log_file_growth:
+        type: int
+        required: false
+        default: 64
+        description:
+          - The growth of the tempdb log file for the SQL Server Analysis Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_analysis_services* is `false`, this is ignored.
+      mssql_sql_server_integration_services_username:
+        type: str
+        required: false
+        description:
+          - The username for the SQL Server Integration Services service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_integration_services* is `false`, this is ignored.
+      mssql_sql_server_integration_services_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the SQL Server Integration Services service account.
+          - If not defined, the default service account will be used.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_integration_services* is `false`, this is ignored.
+      mssql_sql_server_integration_services_startup_type:
+        type: str
+        required: false
+        choices:
+          - Automatic
+          - Manual
+          - Disabled
+        description:
+          - The startup type of SQL Server Integration Services instance.
+          - On Linux, this is ignored.
+          - On Windows, if *mssql_install_integration_services* is `false`, this is ignored.
+      mssql_failover_cluster_group_name:
+        type: str
+        required: false
+        description:
+          - The name of the failover cluster group.
+          - On Linux, this is ignored.
+      mssql_failover_cluster_ip_address:
+        type: str
+        required: false
+        description:
+          - The IP address of the failover cluster.
+          - On Linux, this is ignored.
+      mssql_failover_cluster_network_name:
+        type: str
+        required: false
+        description:
+          - The name of the failover cluster network.
+          - On Linux, this is ignored.
+      mssql_skip_reboot:
+        type: bool
+        required: false
+        default: true
+        description:
+          - Whether to skip the reboot after the SQL Server installation.
+          - On Linux, this is ignored.
+      mssql_monitoring_user:
+        type: str
+        required: false
+        description:
+          - The monitoring user account to use for SQL Server monitoring.
+          - If *mssql_configure_monitoring* is `true`, this is required. Otherwise, this is ignored.
+      mssql_monitoring_password:
+        type: str
+        required: false
+        no_log: true
+        description:
+          - The password for the monitoring user account.
+          - If *mssql_configure_monitoring* is `false`, this is ignored.
+          - If *mssql_vault_manage_monitoring_credentials* is `true` and this is defined, the password will be looked in HashiCorp Vault and this value will be stored there if the secret does not exist.
+          - If *mssql_vault_manage_monitoring_credentials* is `true` and this is not defined, the password will be looked up from HashiCorp Vault and a value will be generate if the secret does not exist.
+          - If *mssql_vault_manage_monitoring_credentials* is `false`, this is required.
+      mssql_vault_monitoring_mount_point:
+        type: str
+        required: false
+        description:
+          - The mount point at which the monitoring password secret will be stored in HashiCorp Vault.
+          - If *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_monitoring_secret_path:
+        type: str
+        required: false
+        description:
+          - The path within the mount point at which the monitoring password secret will be stored in HashiCorp Vault.
+          - If *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_database_mount_point:
+        type: str
+        required: false
+        description:
+          - The mount point of the database secret engine in HashiCorp Vault.
+          - If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_database_connection_name:
+        type: str
+        required: false
+        default: "{{ inventory_hostname }}"
+        description:
+          - The name of the database connection in HashiCorp Vault.
+          - If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_database_connection_username:
+        type: str
+        required: false
+        default: vault
+        description:
+          - The username for the database connection in HashiCorp Vault.
+          - If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_database_connection_temporary_password:
+        type: str
+        required: false
+        no_log: true
+        default: TemporaryPassword123!
+        description:
+          - The temporary password for the database connection in HashiCorp Vault.  This password is only used until the connection is created in HashiCorp Vault, at which time it will be rotated.
+          - If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.
+      mssql_vault_database_connection_hostname:
+        type: str
+        required: false
+        description:
+          - The hostname used to connect to the HashiCorp Vault instance.
+          - If *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.
+      mssql_vault_database_connection_port:
+        type: int
+        required: false
+        default: "{{ mssql_database_port }}"
+        description:
+          - The port used to connect to the HashiCorp Vault instance.
+          - If *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.

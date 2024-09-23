@@ -1,0 +1,97 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+  cachier: machine
+  parallel: true
+platforms:
+  - name: dc
+    box: jtarpley/w2022_cis
+    memory: 2048
+    cpus: 2
+    provider_options:
+      default_prefix: mssql_install_win_
+    groups:
+      - windows
+  - name: win
+    box: jtarpley/${MOLECULE_BOX:-w2022_cis}
+    memory: 4096
+    cpus: 2
+    provider_options:
+      default_prefix: mssql_install_win_
+    groups:
+      - subjects
+      - windows
+  - name: vault
+    box: jtarpley/rocky8_cis
+    memory: 2048
+    cpus: 2
+    provider_options:
+      default_prefix: mssql_install_win_
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        _mssql_sql_server_service_samaccountname: svcsql
+        _mssql_sql_server_agent_service_samaccountname: svcsqlagent
+        _mssql_full_text_filter_daemon_host_samaccountname: svcft
+        _mssql_sql_server_analysis_services_samaccountname: svcas
+        _mssql_sql_server_integration_services_samaccountname: svcis
+        mssql_sql_server_service_password: SecurePassword123!
+        mssql_full_text_filter_daemon_host_password: SecurePassword123!
+        mssql_sql_server_agent_service_password: SecurePassword123!
+        mssql_sql_server_analysis_services_password: SecurePassword123!
+        mssql_sql_server_integration_services_password: SecurePassword123!
+        vault_token: 47542cbc-6bf8-4fba-8eda-02e0a0d29a0a
+        vault_url: "http://{{ hostvars['vault'].ansible_host }}:8200"
+      subjects:
+        _mssql_setup_source_path: "files/{{ mssql_version }}"
+        mssql_host: "{{ ansible_host }}"
+        mssql_user: sa
+        mssql_password: "{{ mssql_sa_password }}"
+        mssql_configure_monitoring: true
+        mssql_vault_manage_monitoring_credentials: true
+        mssql_vault_configure_database_connection: true
+        mssql_install_database_engine: true
+        mssql_install_full_text: true
+        mssql_install_replication: true
+        mssql_install_analysis_services: true
+        mssql_install_integration_services: true
+        mssql_vault_sa_mount_point: mssql
+        mssql_vault_sa_secret_path: users/sa
+        mssql_sa_password: SecurePassword123!
+        mssql_version: ${MOLECULE_MSSQL_VERSION:-2022}
+        mssql_monitoring_user: monitoring
+        mssql_setup_path: "C:\\Windows\\temp\\{{ mssql_version }}"
+        mssql_sql_server_service_username: >-
+          TEST\{{ _mssql_sql_server_service_samaccountname }}
+        mssql_sql_server_agent_service_username: >-
+          TEST\{{ _mssql_sql_server_agent_service_samaccountname }}
+        mssql_database_sysadmin_accounts:
+          - TEST\vagrant
+        mssql_full_text_filter_daemon_host_username: >-
+          TEST\{{ _mssql_full_text_filter_daemon_host_samaccountname }}
+        mssql_sql_server_analysis_services_username: >-
+          TEST\{{ _mssql_sql_server_analysis_services_samaccountname }}
+        mssql_as_sysadmin_accounts:
+          - TEST\vagrant
+        mssql_sql_server_integration_services_username: >-
+          TEST\{{ _mssql_sql_server_integration_services_samaccountname }}
+        mssql_vault_monitoring_mount_point: monitoring
+        mssql_vault_monitoring_secret_path: database
+        mssql_vault_database_mount_point: database
+        mssql_vault_database_connection_hostname: "{{ ansible_host }}"
+        mssql_skip_reboot: false
+      windows:
+        ansible_shell_type: powershell
+        ansible_become_method: runas
+        ansible_become_user: SYSTEM
+    host_vars:
+      win:
+        ansible_user: TEST\vagrant
+verifier:
+  name: ansible

@@ -1,0 +1,168 @@
+---
+_mssql_security_mode_values:
+  mixed: SQL
+  windows: Windows
+
+_mssql_default_database_backup_path: >-
+  {{ mssql_instance_path }}\MSSQL{{ _mssql_major_version }}.{{ mssql_instance_name }}\MSSQL\Backup
+
+_mssql_sqlservr_exe_path: >-
+  {{ mssql_instance_path }}\MSSQL{{ _mssql_major_version }}.{{ mssql_instance_name }}\MSSQL\Binn\sqlservr.exe
+
+_mssql_msdtssrvr_exe_path: >-
+  {{ mssql_instance_path }}\{{ _mssql_major_version }}0\DTS\Binn\MsDtsSrvr.exe
+
+_mssql_sqlengine_feature: >-
+  {{ ['SQLENGINE'] if mssql_install_database_engine else [] }}
+
+_mssql_fulltext_feature: >-
+  {{ ['FULLTEXT'] if mssql_install_full_text else [] }}
+
+_mssql_replication_feature: >-
+  {{ ['REPLICATION'] if mssql_install_replication else [] }}
+
+_mssql_as_feature: >-
+  {{ ['AS'] if mssql_install_analysis_services else [] }}
+
+_mssql_is_feature: >-
+  {{ ['IS'] if mssql_install_integration_services else [] }}
+
+_mssql_features: >-
+  {{ _mssql_sqlengine_feature +
+      _mssql_fulltext_feature +
+      _mssql_replication_feature +
+      _mssql_as_feature +
+      _mssql_is_feature }}
+
+_mssql_update_source: >-
+  {{ ('MU' if mssql_update_from_microsoft_update else mssql_update_source)
+      if mssql_update_enabled else omit }}
+
+_mssql_sql_server_service_username: >-
+  {{ mssql_sql_server_service_username | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_sql_server_service_password: >-
+  {{ mssql_sql_server_service_password | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_sql_server_service_startup_type: >-
+  {{ mssql_sql_server_service_startup_type | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_sql_server_agent_service_username: >-
+  {{ mssql_sql_server_agent_service_username | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_sql_server_agent_service_password: >-
+  {{ mssql_sql_server_agent_service_password | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_sql_server_agent_service_startup_type: >-
+  {{ mssql_sql_server_agent_service_startup_type | default(omit)
+      if mssql_install_database_engine else omit }}
+
+_mssql_database_collation: >-
+  {{ mssql_database_collation if mssql_install_database_engine else omit }}
+
+_mssql_database_sysadmin_accounts: >-
+  {{ mssql_database_sysadmin_accounts | join(', ')
+      if mssql_install_database_engine else omit }}
+
+_mssql_security_mode: >-
+  {{ _mssql_security_mode_values[mssql_security_mode] if mssql_install_database_engine else omit }}
+
+_mssql_sa_password: >-
+  {{ mssql_sa_password if mssql_install_database_engine and mssql_security_mode == 'mixed' else omit }}
+
+_mssql_database_base_path: >-
+  {{ mssql_database_base_path if mssql_install_database_engine else omit }}
+
+_mssql_database_user_db_path: >-
+  {{ mssql_database_user_db_path if mssql_install_database_engine else omit }}
+
+_mssql_database_user_db_log_path: >-
+  {{ mssql_database_user_db_log_path if mssql_install_database_engine else omit }}
+
+_mssql_database_temp_db_path: >-
+  {{ mssql_database_temp_db_path if mssql_install_database_engine else omit }}
+
+_mssql_database_temp_db_log_path: >-
+  {{ mssql_database_temp_db_log_path if mssql_install_database_engine else omit }}
+
+_mssql_database_backup_path: >-
+  {{ mssql_database_backup_path | default(_mssql_default_database_backup_path)
+      if mssql_install_database_engine else omit }}
+
+_mssql_full_text_filter_daemon_host_username: >-
+  {{ mssql_full_text_filter_daemon_host_username | default(omit)
+      if mssql_install_full_text else omit }}
+
+_mssql_full_text_filter_daemon_host_password: >-
+  {{ mssql_full_text_filter_daemon_host_password | default(omit)
+      if mssql_install_full_text else omit }}
+
+_mssql_sql_server_analysis_services_username: >-
+  {{ mssql_sql_server_analysis_services_username | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_sql_server_analysis_services_password: >-
+  {{ mssql_sql_server_analysis_services_password | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_sql_server_analysis_services_startup_type: >-
+  {{ mssql_sql_server_analysis_services_startup_type | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_as_collation: >-
+  {{ mssql_as_collation if mssql_install_analysis_services else omit }}
+
+_mssql_as_sysadmin_accounts: >-
+  {{ mssql_as_sysadmin_accounts | join(', ')
+      if mssql_install_analysis_services else omit }}
+
+_mssql_as_data_path: >-
+  {{ mssql_as_data_path if mssql_install_analysis_services else omit }}
+
+_mssql_as_log_path: >-
+  {{ mssql_as_log_path if mssql_install_analysis_services else omit }}
+
+_mssql_as_backup_path: >-
+  {{ mssql_as_backup_path if mssql_install_analysis_services else omit }}
+
+_mssql_as_temp_path: >-
+  {{ mssql_as_temp_path if mssql_install_analysis_services else omit }}
+
+_mssql_as_config_path: >-
+  {{ mssql_as_config_path if mssql_install_analysis_services else omit }}
+
+_mssql_as_server_mode: >-
+  {{ mssql_as_server_mode | upper if mssql_install_analysis_services else omit }}
+
+_mssql_sql_server_integration_services_username: >-
+  {{ mssql_sql_server_integration_services_username | default(omit)
+      if mssql_install_integration_services else omit }}
+  
+_mssql_sql_server_integration_services_password: >-
+  {{ mssql_sql_server_integration_services_password | default(omit)
+      if mssql_install_integration_services else omit }}
+
+_mssql_sql_server_integration_services_startup_type: >-
+  {{ mssql_sql_server_integration_services_startup_type | default(omit)
+      if mssql_install_integration_services else omit }}
+
+_mssql_as_tempdb_file_count: >-
+  {{ mssql_as_tempdb_file_count | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_as_tempdb_file_growth: >-
+  {{ mssql_as_tempdb_file_growth | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_as_tempdb_log_file_size: >-
+  {{ mssql_as_tempdb_log_file_size | default(omit)
+      if mssql_install_analysis_services else omit }}
+
+_mssql_as_tempdb_log_file_growth: >-
+  {{ mssql_as_tempdb_log_file_growth | default(omit)
+      if mssql_install_analysis_services else omit }}

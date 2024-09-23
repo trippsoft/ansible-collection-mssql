@@ -1,0 +1,27 @@
+---
+- name: Prepare
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Pre-create user
+      loop:
+        - name: existinguser1
+          password: SecurePassword123!
+        - name: existinguser2
+          password: SecurePassword123!
+          login_password_expiration_enabled: false
+          login_password_policy_enforced: false
+        - name: existinguser3
+          password: SecurePassword123!
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: "{{ item.name }}"
+        type: sql
+        password: "{{ item.password }}"
+        login_password_expiration_enabled: "{{ item.login_password_expiration_enabled | default(omit) }}"
+        login_password_policy_enforced: "{{ item.login_password_policy_enforced | default(omit) }}"
+        state: present

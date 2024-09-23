@@ -1,0 +1,44 @@
+---
+- name: Create monitoring credentials mount point
+  when:
+    - mssql_vault_create_secret_engines
+  delegate_to: localhost
+  trippsc2.hashi_vault.vault_kv2_secret_engine:
+    token: "{{ vault_token | default(omit) }}"
+    url: "{{ vault_url | default(omit) }}"
+    engine_mount_point: "{{ mssql_vault_monitoring_mount_point }}"
+    state: present
+
+- name: Configure monitoring credentials secret
+  block:
+    - name: Check for monitoring credentials secret
+      delegate_to: localhost
+      community.hashi_vault.vault_kv2_get:
+        token: "{{ vault_token | default(omit) }}"
+        url: "{{ vault_url | default(omit) }}"
+        engine_mount_point: "{{ mssql_vault_monitoring_mount_point }}"
+        path: "{{ mssql_vault_monitoring_secret_path }}"
+      register: _mssql_vault_monitor_secret
+
+    - name: Set variable to Vault secret
+      ansible.builtin.set_fact:
+        mssql_monitoring_password: "{{ _mssql_vault_monitor_secret.data.data.password }}"
+  rescue:
+    - name: Generate a new password
+      when:
+        - mssql_monitoring_password is not defined
+      ansible.builtin.set_fact:
+        mssql_monitoring_password: >-
+          {{ lookup('ansible.builtin.password',
+                    '/dev/null chars=ascii_lowercase,ascii_uppercase,digits,punctuation length=20') }}
+
+    - name: Store monitoring credentials secret
+      delegate_to: localhost
+      community.hashi_vault.vault_kv2_write:
+        token: "{{ vault_token | default(omit) }}"
+        url: "{{ vault_url | default(omit) }}"
+        engine_mount_point: "{{ mssql_vault_monitoring_mount_point }}"
+        path: "{{ mssql_vault_monitoring_secret_path }}"
+        data:
+          username: "{{ mssql_monitoring_user }}"
+          password: "{{ mssql_monitoring_password }}"

@@ -1,0 +1,43 @@
+---
+- name: Prepare DC
+  hosts:
+    - dc
+  roles:
+    - role: trippsc2.ad.testing_domain_controller
+  tasks:
+    - name: Create AD service accounts
+      loop:
+        - name: "{{ _mssql_sql_server_service_samaccountname }}"
+          password: "{{ mssql_sql_server_service_password }}"
+        - name: "{{ _mssql_sql_server_agent_service_samaccountname }}"
+          password: "{{ mssql_sql_server_agent_service_password }}"
+        - name: "{{ _mssql_full_text_filter_daemon_host_samaccountname }}"
+          password: "{{ mssql_full_text_filter_daemon_host_password }}"
+        - name: "{{ _mssql_sql_server_analysis_services_samaccountname }}"
+          password: "{{ mssql_sql_server_analysis_services_password }}"
+        - name: "{{ _mssql_sql_server_integration_services_samaccountname }}"
+          password: "{{ mssql_sql_server_integration_services_password }}"
+      microsoft.ad.user:
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
+        upn: "{{ item.name }}@test.loc"
+        state: present
+
+- name: Prepare Vault
+  hosts:
+    - vault
+  gather_facts: false
+  roles:
+    - role: trippsc2.hashi_vault.testing
+
+- name: Prepare member server
+  hosts:
+    - subjects
+  gather_facts: false
+  roles:
+    - role: trippsc2.ad.testing_win_member
+  tasks:
+    - name: Copy SQL Server installation media
+      ansible.windows.win_copy:
+        src: "{{ _mssql_setup_source_path }}"
+        dest: "{{ mssql_setup_path | win_dirname }}"

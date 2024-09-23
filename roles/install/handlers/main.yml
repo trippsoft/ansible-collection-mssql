@@ -1,0 +1,60 @@
+---
+- name: Configure SQL Server database engine
+  listen: _mssql_configure_database_engine
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+    MSSQL_SA_PASSWORD: "{{ mssql_sa_password }}"
+    MSSQL_PID: "{{ mssql_product_key | default(_mssql_database_pid) }}"
+    MSSQL_LCID: "{{ mssql_database_lcid }}"
+    MSSQL_COLLATION: "{{ mssql_database_collation }}"
+    MSSQL_TCP_PORT: "{{ mssql_database_port }}"
+    MSSQL_BACKUP_DIR: "{{ _mssql_database_backup_path }}"
+    MSSQL_DATA_DIR: "{{ mssql_database_data_path }}"
+    MSSQL_LOG_DIR: "{{ mssql_database_log_path }}"
+    MSSQL_DUMP_DIR: "{{ mssql_database_dump_path }}"
+    MSSQL_AGENT_ENABLED: "{{ mssql_install_agent | lower }}"
+    MSSQL_MASTER_DATA_FILE: "{{ mssql_database_master_data_file_path }}"
+    MSSQL_MASTER_LOG_FILE: "{{ mssql_database_master_log_file_path }}"
+    MSSQL_ERROR_LOG_FILE: "{{ mssql_database_error_log_file_path }}"
+  ansible.builtin.command: /opt/mssql/bin/mssql-conf -n setup
+  changed_when: true
+
+- name: Fix broken SQL Server Integration Services script
+  listen: _mssql_configure_integration_services
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution_major_version == '8'
+  become: true
+  ansible.builtin.replace:
+    path: /opt/ssis/lib/ssis-conf/ssis-conf.py
+    regexp: '^\#!\/usr\/bin\/python$'
+    replace: '#!/usr/bin/env python2'
+    owner: root
+    group: root
+    mode: '0555'
+
+- name: Configure SQL Server Integration Services
+  listen: _mssql_configure_integration_services
+  become: true
+  environment:
+    ACCEPT_EULA: 'Y'
+    SSIS_PID: "{{ mssql_product_key | default(_mssql_integration_pid) }}"
+  ansible.builtin.command: /opt/ssis/bin/ssis-conf -n setup
+  changed_when: true
+  notify:
+    - _mssql_restart_mssql-server
+
+- name: Restart SQL Server service
+  listen: _mssql_restart_mssql-server
+  become: true
+  ansible.builtin.systemd_service:
+    name: mssql-server.service
+    state: restarted
+
+- name: Reboot
+  listen: _mssql_reboot
+  when:
+    - ansible_os_family == 'Windows'
+    - not mssql_skip_reboot
+  ansible.windows.win_reboot:

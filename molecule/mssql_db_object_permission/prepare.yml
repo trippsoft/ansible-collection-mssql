@@ -1,0 +1,145 @@
+---
+- name: Prepare
+  hosts:
+    - localhost
+  gather_facts: false
+  tasks:
+    - name: Pre-create user
+      trippsc2.mssql.mssql_login:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        type: sql
+        password: SecurePassword123!
+        login_password_expiration_enabled: "{{ item.login_password_expiration_enabled | default(omit) }}"
+        login_password_policy_enforced: "{{ item.login_password_policy_enforced | default(omit) }}"
+        state: present
+
+    - name: Pre-create database user
+      trippsc2.mssql.mssql_db_user:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        name: testuser1
+        database: msdb
+        state: present
+
+    - name: Pre-create ALTER on sysjobactivity permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - alter
+        state: grant
+
+    - name: Pre-create DELETE on sysjobactivity permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - delete
+        state: grant
+
+    - name: Pre-create SELECT on sysjobactivity permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobactivity
+        permissions:
+          - select
+        state: grant
+
+    - name: Pre-create ALTER on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        object: sysjobhistory
+        database: msdb
+        permissions:
+          - alter
+        state: grant_with_grant_option
+
+    - name: Pre-create DELETE on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - delete
+        state: grant_with_grant_option
+
+    - name: Pre-create SELECT on sysjobhistory permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobhistory
+        permissions:
+          - select
+        state: grant_with_grant_option
+
+    - name: Pre-create ALTER on sysjobs permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - alter
+        state: deny
+
+    - name: Pre-create DELETE on sysjobs permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - delete
+        state: deny
+
+    - name: Pre-create SELECT on sysjobs permission
+      trippsc2.mssql.mssql_db_object_permission:
+        login_host: localhost
+        login_port: 1433
+        login_user: sa
+        login_password: SecurePassword123!
+        principal: testuser1
+        database: msdb
+        object: sysjobs
+        permissions:
+          - select
+        state: deny

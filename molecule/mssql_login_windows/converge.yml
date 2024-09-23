@@ -1,0 +1,73 @@
+---
+- name: Converge
+  hosts:
+    - subjects
+  tasks:
+    - name: Check if user would be created
+      check_mode: true
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\testuser1
+        type: windows
+        state: present
+
+    - name: Create user
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\testuser1
+        type: windows
+        state: present
+
+    - name: Check if user would be removed
+      check_mode: true
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\existinguser1
+        state: absent
+
+    - name: Remove user
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\existinguser1
+        state: absent
+
+    - name: Check if user would be changed
+      check_mode: true
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\existinguser2
+        type: windows
+        enabled: false
+        state: present
+
+    - name: Check if user would be changed
+      delegate_to: localhost
+      trippsc2.mssql.mssql_login:
+        login_host: "{{ ansible_host }}"
+        login_port: 1433
+        login_user: sa
+        login_password: "{{ mssql_sa_password }}"
+        name: TEST\existinguser2
+        type: windows
+        enabled: false
+        state: present

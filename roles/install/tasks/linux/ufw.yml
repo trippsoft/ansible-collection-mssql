@@ -1,0 +1,8 @@
+---
+- name: Allow SQL Server port in UFW
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: "{{ mssql_database_port }}"
+    proto: tcp
+    direction: in
