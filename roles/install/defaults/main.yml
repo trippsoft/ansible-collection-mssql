@@ -1,5 +1,8 @@
 ---
+mssql_host: "{{ ansible_host }}"
 mssql_port: "{{ mssql_database_port }}"
+mssql_user: sa
+mssql_password: "{{ mssql_sa_password }}"
 
 mssql_configure_firewall: true
 mssql_configure_monitoring: false

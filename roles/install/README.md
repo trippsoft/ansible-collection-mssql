@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.0.0
+Version: 1.0.1
 
 This role installs Microsoft SQL Server.
 
@@ -15,24 +15,31 @@ This role installs Microsoft SQL Server.
 
 ## Dependencies
 
-None.
+| Collection |
+| ---------- |
+| ansible.posix |
+| ansible.windows |
+| chocolatey.chocolatey |
+| community.general |
+| community.hashi_vault |
+| community.windows |
+| trippsc2.hashi_vault |
+| trippsc2.windows |
 
 ## Role Arguments
 |Option|Description|Type|Required|Choices|Default|
 |---|---|---|---|---|---|
-| mssql_host | <p>The hostname used to connect to the SQL Server instance for configuration.</p> | str | yes |  |  |
+| mssql_host | <p>The hostname used to connect to the SQL Server instance for configuration.</p> | str | no |  | {{ ansible_host }} |
 | mssql_port | <p>The port used to connect to the SQL Server instance for configuration.</p> | int | no |  | {{ mssql_database_port }} |
-| mssql_user | <p>The username used to connect to the SQL Server instance for configuration.</p> | str | yes |  |  |
-| mssql_password | <p>The password used to connect to the SQL Server instance for configuration.</p> | str | yes |  |  |
+| mssql_user | <p>The username used to connect to the SQL Server instance for configuration.</p> | str | no |  | sa |
+| mssql_password | <p>The password used to connect to the SQL Server instance for configuration.</p> | str | no |  | {{ mssql_sa_password }} |
 | vault_url | <p>The URL for accessing HashiCorp Vault.</p><p>Alternatively, this can be configured through ansible.cfg or environment variables.</p> | str | no |  |  |
 | vault_token | <p>The token for accessing HashiCorp Vault.</p><p>Alternatively, this (or any other authentication method) can be configured through ansible.cfg or environment variables.</p> | str | no |  |  |
 | mssql_configure_firewall | <p>Whether to configure the host firewall for the SQL Server instance.</p> | bool | no |  | true |
 | mssql_configure_monitoring | <p>Whether to configure monitoring for the SQL Server instance.</p> | bool | no |  | false |
-| mssql_configure_vault | <p>Whether to configure HashiCorp Vault for the SQL Server instance.</p> | bool | no |  | false |
-| mssql_vault_create_secret_engines | <p>Whether to create the secret engines in HashiCorp Vault.</p><p>If *mssql_configure_vault* is `false`, this is ignored.</p> | bool | no |  | true |
-| mssql_vault_manage_sa_password | <p>Whether to manage the `sa` password in HashiCorp Vault.</p><p>If *mssql_configure_vault* is `false`, this is ignored.</p> | bool | no |  | true |
-| mssql_vault_manage_monitoring_credentials | <p>Whether to manage the monitoring password in HashiCorp Vault.</p><p>If *mssql_configure_vault* or *mssql_configure_monitoring* is `false`, this is ignored.</p> | bool | no |  | true |
-| mssql_vault_configure_database_connection | <p>Whether to configure the database connection in HashiCorp Vault.</p><p>If *mssql_configure_vault* is `false`, this is ignored.</p> | bool | no |  | false |
+| mssql_vault_manage_monitoring_credentials | <p>Whether to manage the monitoring password in HashiCorp Vault.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p> | bool | no |  | true |
+| mssql_vault_configure_database_connection | <p>Whether to configure the database connection in HashiCorp Vault.</p> | bool | no |  | false |
+| mssql_vault_create_secret_engines | <p>Whether to create the secret engines in HashiCorp Vault.</p> | bool | no |  | true |
 | mssql_install_database_engine | <p>Whether to install the `SQL Server Database Engine` feature.</p><p>On Linux, this is ignored as it is required for any SQL Server component.</p> | bool | no |  | true |
 | mssql_install_agent | <p>Whether to install the `SQL Server Agent` feature.</p><p>On Windows, this is ignored as it is included with the `SQL Server Database Engine` feature automatically.</p><p>On Linux, this will enable SQL Server Agent in the configuration.</p><p>For SQL Server on Linux 2017, this will also install the separate `mssql-server-agent` package.</p> | bool | no |  | true |
 | mssql_install_full_text | <p>Whether to install the `Full-Text and Semantic Extractions for Search` feature.</p><p>If *mssql_install_database_engine* is `false`, this must be set to `false`.</p> | bool | no |  | false |
@@ -40,9 +47,7 @@ None.
 | mssql_install_analysis_services | <p>Whether to install the `Analysis Services` feature.</p><p>On Linux, this is ignored as this feature is not available.</p> | bool | no |  | false |
 | mssql_install_integration_services | <p>Whether to install the `Integration Services` feature.</p> | bool | no |  | false |
 | mssql_install_sql_server_management_studio | <p>Whether to install SQL Server Management Studio.</p><p>On Linux, this is ignored as this feature is not available.</p> | bool | no |  | true |
-| mssql_vault_sa_mount_point | <p>The mount point at which the `sa` password secret will be stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_sa_password* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_vault_sa_secret_path | <p>The path within the mount point at which the `sa` password secret will be stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_sa_password* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_sa_password | <p>The password for the `sa` account.</p><p>On Windows, if *mssql_security_mode* is `windows` this is ignored.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_sa_password* are `true` and this is defined, this password will be stored in HashiCorp Vault if not already stored there.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_sa_password* are `true` and this is not defined, the password will be looked up from HashiCorp Vault or generated and stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* or *mssql_vault_manage_sa_password* are `false`, this is required.</p> | str | no |  |  |
+| mssql_sa_password | <p>The password for the `sa` account.</p><p>On Linux, this is required.</p><p>On Windows, if *mssql_security_mode* is `windows` this is ignored. Otherwise, this is required.</p> | str | no |  |  |
 | mssql_version | <p>The version of the SQL Server to install.</p><p>On Linux, this will be validated against the distribution release for compatibility.</p><p>On Windows, this must match the version of the installation media.  This will not be validated.</p> | str | yes | <ul><li>2016</li><li>2017</li><li>2019</li><li>2022</li></ul> |  |
 | mssql_firewall_type | <p>The type of firewall to configure on Linux systems.</p><p>On Windows, this is ignored.</p><p>On EL systems, this defaults to `firewalld`.</p><p>On Ubuntu systems, this defaults to `ufw`.</p> | str | no | <ul><li>firewalld</li><li>ufw</li></ul> |  |
 | mssql_database_port | <p>The port for the SQL Server instance.</p><p>On Windows, this is ignored.</p> | int | no |  | 1433 |
@@ -125,17 +130,15 @@ None.
 | mssql_failover_cluster_network_name | <p>The name of the failover cluster network.</p><p>On Linux, this is ignored.</p> | str | no |  |  |
 | mssql_skip_reboot | <p>Whether to skip the reboot after the SQL Server installation.</p><p>On Linux, this is ignored.</p> | bool | no |  | true |
 | mssql_monitoring_user | <p>The monitoring user account to use for SQL Server monitoring.</p><p>If *mssql_configure_monitoring* is `true`, this is required. Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_monitoring_password | <p>The password for the monitoring user account.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_monitoring_credentials* are `true` and this is defined, this password will be stored in HashiCorp Vault if not already stored there.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_monitoring_credentials* are `true` and this is not defined, the password will be looked up from HashiCorp Vault or generated and stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* or *mssql_vault_manage_monitoring_credentials* are `false`, this is required.</p> | str | no |  |  |
-| mssql_vault_monitoring_mount_point | <p>The mount point at which the monitoring password secret will be stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_vault_monitoring_secret_path | <p>The path within the mount point at which the monitoring password secret will be stored in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_vault_database_mount_point | <p>The mount point of the database secret engine in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_vault_database_connection_name | <p>The name of the database connection in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | {{ inventory_hostname }} |
-| mssql_vault_database_connection_username | <p>The username for the database connection in HashiCorp Vault.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | vault |
-| mssql_vault_database_connection_temporary_password | <p>The temporary password for the database connection in HashiCorp Vault.  This password is only used until the connection is created in HashiCorp Vault, at which time it will be rotated.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | TemporaryPassword123! |
-| mssql_vault_database_connection_hostname | <p>The hostname used to connect to the HashiCorp Vault instance.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.</p> | str | no |  |  |
-| mssql_vault_database_connection_port | <p>The port used to connect to the HashiCorp Vault instance.</p><p>If *mssql_configure_vault* and *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.</p> | int | no |  | {{ mssql_database_port }} |
-| mssql_vault_managed_logins | <p>The list of managed logins to create and configure to be managed by HashiCorp Vault.</p><p>If *mssql_configure_vault* or *mssql_vault_configure_database_connection* is `false`, this is ignored.</p> | list of 'str' | no |  |  |
-| mssql_password_rotation_period | <p>The period in seconds after which the password for the managed logins will be rotated.</p><p>If *mssql_configure_vault* or *mssql_vault_configure_database_connection* is `false`, this is ignored.</p> | int | no |  | 5184000 |
+| mssql_monitoring_password | <p>The password for the monitoring user account.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p><p>If *mssql_vault_manage_monitoring_credentials* is `true` and this is defined, the password will be looked in HashiCorp Vault and this value will be stored there if the secret does not exist.</p><p>If *mssql_vault_manage_monitoring_credentials* is `true` and this is not defined, the password will be looked up from HashiCorp Vault and a value will be generate if the secret does not exist.</p><p>If *mssql_vault_manage_monitoring_credentials* is `false`, this is required.</p> | str | no |  |  |
+| mssql_vault_monitoring_mount_point | <p>The mount point at which the monitoring password secret will be stored in HashiCorp Vault.</p><p>If *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
+| mssql_vault_monitoring_secret_path | <p>The path within the mount point at which the monitoring password secret will be stored in HashiCorp Vault.</p><p>If *mssql_vault_manage_monitoring_credentials* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
+| mssql_vault_database_mount_point | <p>The mount point of the database secret engine in HashiCorp Vault.</p><p>If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  |  |
+| mssql_vault_database_connection_name | <p>The name of the database connection in HashiCorp Vault.</p><p>If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | {{ inventory_hostname }} |
+| mssql_vault_database_connection_username | <p>The username for the database connection in HashiCorp Vault.</p><p>If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | vault |
+| mssql_vault_database_connection_temporary_password | <p>The temporary password for the database connection in HashiCorp Vault.  This password is only used until the connection is created in HashiCorp Vault, at which time it will be rotated.</p><p>If *mssql_vault_configure_database_connection* is `true`, this is required.  Otherwise, this is ignored.</p> | str | no |  | TemporaryPassword123! |
+| mssql_vault_database_connection_hostname | <p>The hostname used to connect to the HashiCorp Vault instance.</p><p>If *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.</p> | str | no |  |  |
+| mssql_vault_database_connection_port | <p>The port used to connect to the HashiCorp Vault instance.</p><p>If *mssql_vault_configure_database_connection* are `true`, this is required. Otherwise, this is ignored.</p> | int | no |  | {{ mssql_database_port }} |
 
 
 ## License

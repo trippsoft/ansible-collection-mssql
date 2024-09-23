@@ -9,7 +9,8 @@ argument_specs:
     options:
       mssql_host:
         type: str
-        required: true
+        required: false
+        default: "{{ ansible_host }}"
         description:
           - The hostname used to connect to the SQL Server instance for configuration.
       mssql_port:
@@ -20,12 +21,14 @@ argument_specs:
           - The port used to connect to the SQL Server instance for configuration.
       mssql_user:
         type: str
-        required: true
+        required: false
+        default: sa
         description:
           - The username used to connect to the SQL Server instance for configuration.
       mssql_password:
         type: str
-        required: true
+        required: false
+        default: "{{ mssql_sa_password }}"
         no_log: true
         description:
           - The password used to connect to the SQL Server instance for configuration.
