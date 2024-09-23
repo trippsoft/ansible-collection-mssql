@@ -66,7 +66,7 @@ argument_specs:
       mssql_vault_manage_monitoring_credentials:
         type: bool
         required: false
-        default: true
+        default: false
         description:
           - Whether to manage the monitoring password in HashiCorp Vault.
           - If *mssql_configure_monitoring* is `false`, this is ignored.
