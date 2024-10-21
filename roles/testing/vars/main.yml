@@ -1,9 +1,0 @@
----
-mssql_vault_manage_sa_password: false
-mssql_version: '2022'
-mssql_database_edition: developer
-mssql_active_directory_user: vagrant
-mssql_active_directory_password: vagrant
-mssql_active_directory_realm: TEST.LOC
-mssql_active_directory_admin_username: vagrant
-mssql_active_directory_admin_password: vagrant

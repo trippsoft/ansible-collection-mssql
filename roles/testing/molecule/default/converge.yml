@@ -1,6 +1,0 @@
----
-- name: Converge
-  hosts:
-    - subjects
-  roles:
-    - role: trippsc2.mssql.testing
