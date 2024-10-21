@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.testing
-Version: 1.2.0
+Version: 1.2.1
 
 This role installs a testing Microsoft SQL Server.
 

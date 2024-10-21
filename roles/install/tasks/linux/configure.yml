@@ -199,6 +199,7 @@
         cmd: "/opt/mssql/bin/mssql-conf -n setup-ad-keytab {{ mssql_active_directory_keytab_path }} {{ mssql_active_directory_user }}"
         creates: "{{ mssql_active_directory_keytab_path }}"
       notify: _mssql_restart_mssql-server
+      retries: 3
 
     - name: Configure Active Directory keytab path
       become: true
