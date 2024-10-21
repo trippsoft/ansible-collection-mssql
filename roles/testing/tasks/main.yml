@@ -1,0 +1,20 @@
+---
+- name: Modify AD user for SPN
+  delegate_to: "{{ dc_inventory_name }}"
+  microsoft.ad.user:
+    name: vagrant
+    upn: vagrant@test.loc
+    attributes:
+      set:
+        msDS-SupportedEncryptionTypes: 24
+    spn:
+      set:
+        - MSSQLSvc/linux
+        - MSSQLSvc/linux.test.loc
+        - MSSQLSvc/linux:1433
+        - MSSQLSvc/linux.test.loc:1433
+    state: present
+
+- name: Import trippsc2.mssql.install role
+  ansible.builtin.import_role:
+    name: trippsc2.mssql.install
