@@ -9,5 +9,6 @@ MOLECULE_BOX="ubuntu2204_base" molecule test -s linux
 MOLECULE_BOX="rocky9_base" molecule test -s linux
 
 MOLECULE_BOX="w2019_cis" molecule test -s win
+MOLECULE_BOX="w2025_base" molecule test -s win
 
 MOLECULE_BOX="ubuntu2004_base" molecule test -s linux
