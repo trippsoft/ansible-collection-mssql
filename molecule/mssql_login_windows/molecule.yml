@@ -57,6 +57,8 @@ provisioner:
         ansible_become_method: runas
         ansible_become_user: SYSTEM
         ansible_password: vagrant
+    host_vars:
+      dc:
         ansible_ssh_common_args: '-o PreferredAuthentications=password -o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o ControlMaster=auto -o ControlPersist=60s -o ForwardX11=no -o LogLevel=ERROR -o StrictHostKeyChecking=no'
 verifier:
   name: ansible
