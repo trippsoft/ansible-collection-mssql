@@ -1,0 +1,214 @@
+---
+DOCUMENTATION:
+  module: mssql_db_permission
+  version_added: 1.0.0
+  author:
+    - Jim Tarpley (@trippsc2)
+  short_description: Configures a SQL database-level permission in a Microsoft SQL Server instance.
+  description:
+    - Configures a SQL database-level permission in a Microsoft SQL Server instance.
+  attributes:
+    check_mode:
+      support: full
+      description:
+        - This module supports check mode.
+  extends_documentation_fragment:
+    - trippsc2.mssql.login
+  options:
+    principal:
+      type: str
+      required: true
+      description:
+        - The name of the database user or role for which to configure permissions.
+    database:
+      type: str
+      required: true
+      description:
+        - The name of the database for which to configure permissions.
+    permissions:
+      type: list
+      required: true
+      elements: str
+      choices:
+        - administer_database_bulk_operations
+        - alter
+        - alter_any_application_role
+        - alter_any_assembly
+        - alter_any_asymmetric_key
+        - alter_any_certificate
+        - alter_any_column_encryption_key
+        - alter_any_column_master_key_definition
+        - alter_any_contract
+        - alter_any_database_audit
+        - alter_any_database_ddl_trigger
+        - alter_any_database_event_notification
+        - alter_any_database_event_session
+        - alter_any_database_scoped_configuration
+        - alter_any_dataspace
+        - alter_any_external_data_source
+        - alter_any_external_file_format
+        - alter_any_external_library
+        - alter_any_fulltext_catalog
+        - alter_any_mask
+        - alter_any_message_type
+        - alter_any_remote_service_binding
+        - alter_any_role
+        - alter_any_route
+        - alter_any_schema
+        - alter_any_security_policy
+        - alter_any_sensitivity_classification
+        - alter_any_service
+        - alter_any_symmetric_key
+        - alter_any_user
+        - authenticate
+        - backup_database
+        - backup_log
+        - checkpoint
+        - connect
+        - connect_replication
+        - control
+        - create_aggregate
+        - create_any_external_library
+        - create_assembly
+        - create_asymmetric_key
+        - create_certificate
+        - create_contract
+        - create_database
+        - create_database_ddl_event_notification
+        - create_default
+        - create_fulltext_catalog
+        - create_function
+        - create_message_type
+        - create_procedure
+        - create_queue
+        - create_remote_service_binding
+        - create_role
+        - create_route
+        - create_rule
+        - create_schema
+        - create_service
+        - create_symmetric_key
+        - create_synonym
+        - create_table
+        - create_type
+        - create_view
+        - create_xml_schema_collection
+        - delete
+        - execute
+        - execute_any_external_endpoint
+        - execute_any_external_script
+        - execute_external_script
+        - insert
+        - kill_database_connection
+        - references
+        - select
+        - showplan
+        - subscribe_query_notifications
+        - take_ownership
+        - unmask
+        - update
+        - view_any_column_encryption_key_definition
+        - view_any_column_master_key_definition
+        - view_database_state
+        - view_definition
+      description:
+        - The type of database-level permission to configure.
+    state:
+      type: str
+      required: false
+      default: grant
+      choices:
+        - grant
+        - deny
+        - grant_with_grant_option
+        - revoke
+      description:
+        - The state of the database-level permission.
+EXAMPLES: |
+  - name: Grant SQL database-level permissions
+    trippsc2.mssql.mssql_db_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      database: tempdb
+      permissions:
+        - connect
+        - update
+      state: grant
+
+  - name: Deny SQL database-level permissions
+    trippsc2.mssql.mssql_db_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      database: tempdb
+      permissions:
+        - connect
+        - update
+      state: deny
+
+  - name: Grant SQL database-level permissions with grant option
+    trippsc2.mssql.mssql_db_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      database: tempdb
+      permissions:
+        - connect
+        - update
+      state: grant_with_grant_option
+
+  - name: Remove SQL database-level permissions
+    trippsc2.mssql.mssql_db_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      database: tempdb
+      permissions:
+        - connect
+        - update
+      state: revoke
+
+RETURN:
+  current:
+    type: dict
+    returned: O(state=present)
+    description:
+      - The configuration of the SQL database-level permissions.
+    sample:
+      - permission: connect
+        state: grant_with_grant_option
+      - permission: update
+        state: grant_with_grant_option
+    contains:
+      permission:
+        type: str
+        description:
+          - The database-level permission.
+      state:
+        type: str
+        description:
+          - The state of the database-level permission.
+  previous:
+    type: dict
+    returned: changed
+    description:
+      - The previous configuration of the SQL database-level permissions.
+    sample:
+      - permission: connect
+        state: grant
+      - permission: update
+        state: deny
+    contains:
+      permission:
+        type: str
+        description:
+          - The database-level permission.
+      state:
+        type: str
+        description:
+          - The state of the database-level permission.

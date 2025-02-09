@@ -1,0 +1,204 @@
+---
+DOCUMENTATION:
+  module: mssql_login
+  version_added: 1.0.0
+  author:
+    - Jim Tarpley (@trippsc2)
+  short_description: Configures a SQL Login in a Microsoft SQL Server instance.
+  description:
+    - Configures a SQL Login in a Microsoft SQL Server instance.
+  attributes:
+    check_mode:
+      support: full
+      description:
+        - This module supports check mode.
+  extends_documentation_fragment:
+    - trippsc2.mssql.login
+  options:
+    name:
+      type: str
+      required: true
+      description:
+        - The name of the SQL Login to configure.
+    type:
+      type: str
+      required: false
+      default: sql
+      choices:
+        - sql
+        - windows
+      description:
+        - The type of login to configure.
+    state:
+      type: str
+      required: false
+      default: present
+      choices:
+        - present
+        - absent
+      description:
+        - The desired state of the SQL Login.
+    enabled:
+      type: bool
+      required: false
+      description:
+        - Specifies whether the SQL Login is enabled.
+        - Only valid when C(state=present).
+    password:
+      type: str
+      required: false
+      description:
+        - The password for the SQL Login.
+        - Only valid when C(state=present) and C(type=sql).
+        - Required when C(state=present) and C(type=sql).
+    update_password:
+      type: str
+      required: false
+      default: always
+      choices:
+        - always
+        - on_create
+      description:
+        - Specifies when to update the password.
+        - Only valid when C(state=present) and C(type=sql).
+    login_password_expiration_enabled:
+      type: bool
+      required: false
+      description:
+        - Specifies whether the SQL Login password expiration policy is enabled.
+        - Only valid when C(state=present) and C(type=sql).
+    login_password_policy_enforced:
+      type: bool
+      required: false
+      description:
+        - Specifies whether the SQL Login password policy is enforced.
+        - Only valid when C(state=present) and C(type=sql).
+EXAMPLES: |
+  - name: Create a SQL Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: test
+      password: password
+      state: present
+      
+  - name: Remove a SQL Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: test
+      state: absent
+
+  - name: Disable a SQL Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: test
+      password: password
+      state: present
+      enabled: false
+
+  - name: Configure a SQL Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: test
+      password: password
+      state: present
+      login_must_change_password: true
+      login_password_expiration_enabled: true
+      login_password_policy_enforced: true
+
+  - name: Create a Windows Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: "TEST\\testuser"
+      type: windows
+      state: present
+
+  - name: Remove a Windows Login
+    trippsc2.mssql.mssql_login:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      name: "TEST\\testuser"
+      state: absent
+
+RETURN:
+  current:
+    type: dict
+    returned: O(state=present)
+    description:
+      - The configuration of the created SQL login.
+    sample:
+      name: test
+      type: sql
+      enabled: true
+      login_password_expiration_enabled: false
+      login_password_policy_enforced: false
+    contains:
+      name:
+        type: str
+        description:
+          - The name of the SQL login.
+      type:
+        type: str
+        description:
+          - The type of login.
+      enabled:
+        type: bool
+        description:
+          - Whether the SQL login is enabled.
+      login_password_expiration_enabled:
+        type: bool
+        description:
+          - Whether the SQL login password expiration policy is enabled.
+      login_password_policy_enforced:
+        type: bool
+        description:
+          - Whether the SQL login password policy is enforced.
+  previous:
+    description:
+      - The previous configuration of the SQL login.
+    type: dict
+    returned: changed
+    sample:
+      name: test
+      type: sql
+      enabled: true
+      login_password_expiration_enabled: false
+      login_password_policy_enforced: false
+    contains:
+      name:
+        type: str
+        description:
+          - The name of the SQL login.
+      type:
+        type: str
+        description:
+          - The type of login.
+      enabled:
+        type: bool
+        description:
+          - Whether the SQL login is enabled.
+      login_password_expiration_enabled:
+        type: bool
+        description:
+          - Whether the SQL login password expiration policy is enabled.
+      login_password_policy_enforced:
+        type: bool
+        description:
+          - Whether the SQL login password policy is enforced.
+  password_set:
+    description:
+      - Whether the password was set.
+    type: bool
+    returned: changed
+    sample:
+      true

@@ -2,178 +2,25 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
 
-DOCUMENTATION = r"""
-module: mssql_server_permission
-version_added: 1.0.0
-author:
-  - Jim Tarpley
-short_description: Configures a SQL server-level permission in a Microsoft SQL Server instance.
-description:
-  - Configures a SQL server-level permission in a Microsoft SQL Server instance.
-attributes:
-  check_mode:
-    support: full
-    details:
-      - This module supports check mode.
-extends_documentation_fragment:
-  - trippsc2.mssql.login
-options:
-  principal:
-    type: str
-    required: true
-    description:
-      - The name of the SQL login or role for which to configure server-level permissions.
-  permissions:
-    type: list
-    required: true
-    elements: str
-    choices:
-      - administer_bulk_operations
-      - alter_any_availability_group
-      - alter_any_connection
-      - alter_any_credential
-      - alter_any_database
-      - alter_any_endpoint
-      - alter_any_event_notification
-      - alter_any_event_session
-      - alter_any_linked_server
-      - alter_any_login
-      - alter_any_server_audit
-      - alter_any_server_role
-      - alter_resources
-      - alter_server_state
-      - alter_settings
-      - alter_trace
-      - authenticate_server
-      - connect_any_database
-      - connect_sql
-      - control_server
-      - create_any_database
-      - create_availability_group
-      - create_ddl_event_notification
-      - create_endpoint
-      - create_server_role
-      - create_trace_event_notification
-      - external_access_assembly
-      - impersonate_any_login
-      - select_all_user_securables
-      - shutdown
-      - unsafe_assembly
-      - view_any_database
-      - view_any_definition
-      - view_server_state
-    description:
-      - The type of server-level permission to configure.
-  state:
-    type: str
-    required: false
-    default: grant
-    choices:
-      - grant
-      - deny
-      - grant_with_grant_option
-      - revoke
-    description:
-      - The state of the server-level permissions.
-"""
+import traceback
 
-EXAMPLES = r"""
-- name: Grant SQL server-level permissions
-  trippsc2.mssql.mssql_server_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    principal: test
-    permissions:
-      - connect_sql
-      - view_server_state
-    state: grant
-    
-- name: Deny SQL server-level permissions
-  trippsc2.mssql.mssql_server_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    principal: test
-    permissions:
-      - connect_sql
-      - view_server_state
-    state: deny
+try:
+    import pymssql
+except ImportError:
+    HAS_PYMSSQL = False
+    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PYMSSQL = True
+    PYMSSQL_IMPORT_ERROR = None
 
-- name: Grant SQL server-level permissions with grant option
-  trippsc2.mssql.mssql_server_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    principal: test
-    permissions:
-      - connect_sql
-      - view_server_state
-    state: grant_with_grant_option
+from typing import List
 
-- name: Remove SQL server-level permissions
-  trippsc2.mssql.mssql_server_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    principal: test
-    permissions:
-      - connect_sql
-      - view_server_state
-    state: revoke
-"""
-
-RETURN = r"""
-current:
-  type: dict
-  returned:
-    - success
-    - state is C(present)
-  description:
-    - The configuration of the SQL server-level permissions.
-  sample:
-    - permission: connect_sql
-      state: grant_with_grant_option
-    - permission: view_server_state
-      state: grant_with_grant_option
-  contains:
-    permission:
-      type: str
-      description:
-        - The server-level permission.
-    state:
-      type: str
-      description:
-        - The state of the server-level permission.
-previous:
-  type: dict
-  returned:
-    - success
-    - changed
-  description:
-    - The previous configuration of the SQL server-level permissions.
-  sample:
-    - permission: connect_sql
-      state: grant
-    - permission: view_server_state
-      state: deny
-  contains:
-    permission:
-      type: str
-      description:
-        - The server-level permission.
-    state:
-      type: str
-      description:
-        - The state of the server-level permission.
-"""
+from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
-
-from ansible.module_utils.common.text.converters import to_native
 
 
 def run_module():
@@ -211,7 +58,7 @@ def run_module():
                     'create_endpoint',
                     'create_server_role',
                     'create_trace_event_notification',
-                    'external_access',
+                    'external_access_assembly',
                     'impersonate_any_login',
                     'select_all_user_securables',
                     'shutdown',
@@ -225,10 +72,15 @@ def run_module():
                 type='str',
                 required=False,
                 default='grant',
-                choices=['grant','deny','grant_with_grant_option','revoke']
+                choices=['grant', 'deny', 'grant_with_grant_option', 'revoke']
             )
         )
     )
+
+    if not HAS_PYMSSQL:
+        module.fail_json(
+            msg=missing_required_lib('pymssql'),
+            exception=PYMSSQL_IMPORT_ERROR)
 
     params = module.get_defined_non_connection_params()
     module.initialize_client()
@@ -244,7 +96,7 @@ def run_module():
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
             changed = True
-        
+
         if previous_state != 'revoke':
             previous.append(dict(permission=permission, state=previous_state))
 
@@ -301,9 +153,8 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 
 def get_server_permissions(
         principal: str,
-        permissions: list[str],
-        module: MssqlModule
-    ) -> dict:
+        permissions: List[str],
+        module: MssqlModule) -> dict:
     """
     Gets the server-level permissions.
 
@@ -328,8 +179,7 @@ def get_server_permission(
         principal: str,
         permission: str,
         module: MssqlModule,
-        results: dict
-    ) -> dict:
+        results: dict) -> dict:
     """
     Gets the server-level permission.
 
@@ -359,7 +209,7 @@ def get_server_permission(
         row: dict | None = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
-    
+
     if row is None:
         results[permission] = 'revoke'
     else:
@@ -387,8 +237,7 @@ def modify_permission(
         permission: str,
         previous_state: str,
         state: str,
-        module: MssqlModule
-    ) -> None:
+        module: MssqlModule) -> None:
     """
     Modifies the server-level permission.
 
@@ -399,10 +248,10 @@ def modify_permission(
         state (str): The desired state of the permission.
         module (MssqlModule): The module instance.
     """
-    
+
     if previous_state == state:
         return
-    
+
     if state == 'revoke':
         if previous_state == 'grant_with_grant_option':
             query = f'REVOKE {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'

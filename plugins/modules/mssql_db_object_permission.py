@@ -2,170 +2,17 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
 
-DOCUMENTATION = r"""
-module: mssql_db_object_permission
-version_added: 1.0.0
-author:
-  - Jim Tarpley
-short_description: Configures a SQL database object-level permission in a Microsoft SQL Server instance.
-description:
-  - Configures a SQL database object-level permission in a Microsoft SQL Server instance.
-attributes:
-  check_mode:
-    support: full
-    details:
-      - This module supports check mode.
-extends_documentation_fragment:
-  - trippsc2.mssql.login
-options:
-  principal:
-    type: str
-    required: true
-    description:
-      - The name of the database user or role for which to configure permissions.
-  database:
-    type: str
-    required: true
-    description:
-      - The name of the database in which the object exists for which to configure permissions.
-  schema:
-    type: str
-    required: false
-    description:
-      - The name of the schema in which the object exists for which to configure permissions.
-  object:
-    type: str
-    required: true
-    description:
-      - The name of the object for which to configure permissions.
-  permissions:
-    type: list
-    required: true
-    elements: str
-    choices:
-      - alter
-      - control
-      - delete
-      - execute
-      - insert
-      - receive
-      - references
-      - select
-      - take_ownership
-      - update
-      - view_change_tracking
-      - view_definition
-    description:
-      - The type of database object-level permission to configure.
-  state:
-    type: str
-    required: false
-    default: grant
-    choices:
-      - grant
-      - deny
-      - grant_with_grant_option
-      - revoke
-    description:
-        - The state of the database object-level permission.
-"""
+import traceback
 
-EXAMPLES = r"""
-- name: Grant SQL database object-level permissions
-  trippsc2.mssql.mssql_db_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    user: test
-    database: tempdb
-    permissions:
-      - connect
-      - update
-    state: grant
-    
-- name: Deny SQL database object-level permissions
-  trippsc2.mssql.mssql_db_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    user: test
-    database: tempdb
-    permissions:
-      - connect
-      - update
-    state: deny
-
-- name: Grant SQL database object-level permissions with grant option
-  trippsc2.mssql.mssql_db_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    user: test
-    database: tempdb
-    permissions:
-      - connect
-      - update
-    state: grant_with_grant_option
-
-- name: Remove SQL database object-level permissions
-  trippsc2.mssql.mssql_db_permission:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    user: test
-    database: tempdb
-    permissions:
-      - connect
-      - update
-    state: revoke
-"""
-
-RETURN = r"""
-current:
-  type: dict
-  returned:
-    - success
-    - state is C(present)
-  description:
-    - The configuration of the SQL database object-level permissions.
-  sample:
-    - permission: connect
-      state: grant_with_grant_option
-    - permission: update
-      state: grant_with_grant_option
-  contains:
-    permission:
-      type: str
-      description:
-        - The database object-level permission.
-    state:
-      type: str
-      description:
-        - The state of the database object-level permission.
-previous:
-  type: dict
-  returned:
-    - success
-    - changed
-  description:
-    - The previous configuration of the SQL database object-level permissions.
-  sample:
-    - permission: connect
-      state: grant
-    - permission: update
-      state: deny
-  contains:
-    permission:
-      type: str
-      description:
-        - The database object-level permission.
-    state:
-      type: str
-      description:
-        - The state of the database object-level permission.
-"""
+try:
+    import pymssql
+except ImportError:
+    HAS_PYMSSQL = False
+    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PYMSSQL = True
+    PYMSSQL_IMPORT_ERROR = None
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
@@ -203,7 +50,7 @@ def run_module():
                 type='str',
                 required=False,
                 default='grant',
-                choices=['grant','deny','grant_with_grant_option','revoke']
+                choices=['grant', 'deny', 'grant_with_grant_option', 'revoke']
             )
         )
     )
@@ -234,7 +81,7 @@ def run_module():
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
             changed = True
-        
+
         if previous_state != 'revoke':
             previous.append(dict(permission=permission, state=previous_state))
 
@@ -375,8 +222,7 @@ def get_db_object_permissions(
         schema: str,
         object: str,
         permissions: list,
-        module: MssqlModule
-    ) -> dict:
+        module: MssqlModule) -> dict:
     """
     Retrieves the database object-level permissions.
 
@@ -415,8 +261,7 @@ def get_db_object_permission(
         object: str,
         permission: str,
         module: MssqlModule,
-        results: dict
-    ) -> dict:
+        results: dict) -> dict:
     """
     Retrieves the database object-level permission.
 
@@ -457,7 +302,7 @@ def get_db_object_permission(
         row = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
-    
+
     if row is None:
         results[permission] = 'revoke'
     else:
@@ -488,8 +333,7 @@ def modify_permission(
         permission: str,
         previous_state: str,
         state: str,
-        module: MssqlModule
-    ) -> None:
+        module: MssqlModule) -> None:
     """
     Modifies the database object-level permission.
 
@@ -503,10 +347,10 @@ def modify_permission(
         state (str): The new state of the permission.
         module (MssqlModule): The module instance.
     """
-    
+
     if previous_state == state:
         return
-    
+
     if state == 'revoke':
         if previous_state == 'grant_with_grant_option':
             query = f"""

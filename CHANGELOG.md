@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2025-02-09
+
+### mssql_db_object_permission Module Plugin
+
+- Made various changes for code quality and style improvements suggested by Ansible sanity tests.
+
+### mssql_db_permission Module Plugin
+
+- Made various changes for code quality and style improvements suggested by Ansible sanity tests.
+
+### mssql_db_user Module Plugin
+
+- Made various changes for code quality and style improvements suggested by Ansible sanity tests.
+
+### mssql_login Module Plugin
+
+- Made various changes for code quality and style improvements suggested by Ansible sanity tests.
+
+### mssql_server_permission Module Plugin
+
+- Made various changes for code quality and style improvements suggested by Ansible sanity tests.
+
 ## [1.3.1] - 2025-01-08
 
 ### Collection

@@ -2,73 +2,23 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
 
-DOCUMENTATION = r"""
-module: mssql_db_user
-version_added: 1.0.0
-author:
-  - Jim Tarpley
-short_description: Configures a SQL database user in a Microsoft SQL Server instance.
-description:
-  - Configures a SQL database user in a Microsoft SQL Server instance.
-attributes:
-  check_mode:
-    support: full
-    details:
-      - This module supports check mode.
-extends_documentation_fragment:
-  - trippsc2.mssql.login
-options:
-  name:
-    type: str
-    required: true
-    description:
-      - The name of the SQL Login to configure as a database user.
-  database:
-    type: str
-    required: true
-    description:
-      - The name of the database for which to configure the SQL Login as a user.
-  state:
-    type: str
-    required: false
-    default: present
-    choices:
-      - present
-      - absent
-    description:
-       - The desired state of the SQL Login.
-"""
+import traceback
 
-EXAMPLES = r"""
-- name: Create a SQL database user
-  trippsc2.mssql.mssql_login:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    name: test
-    database: tempdb
-    state: present
-    
-- name: Remove a SQL database user
-  trippsc2.mssql.mssql_login:
-    login_user: sa
-    login_password: password
-    login_host: localhost
-    name: test
-    database: tempdb
-    state: absent
-"""
+try:
+    import pymssql
+except ImportError:
+    HAS_PYMSSQL = False
+    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PYMSSQL = True
+    PYMSSQL_IMPORT_ERROR = None
 
-RETURN = r"""
-"""
-
+from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
-
-from ansible.module_utils.common.text.converters import to_native
 
 
 def run_module():
@@ -79,6 +29,11 @@ def run_module():
             state=dict(type='str', required=False, default='present', choices=['present', 'absent'])
         )
     )
+
+    if not HAS_PYMSSQL:
+        module.fail_json(
+            msg=missing_required_lib('pymssql'),
+            exception=PYMSSQL_IMPORT_ERROR)
 
     params = module.get_defined_non_connection_params()
     module.initialize_client()
@@ -134,7 +89,7 @@ def ensure_present(params: dict, module: MssqlModule) -> dict:
 
     if get_user(name, database, module):
         return dict(changed=False)
-    
+
     if not module.check_mode:
         query = f"""
         USE [{database}];

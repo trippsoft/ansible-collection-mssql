@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.3.1
+Version: 1.3.2
 
 This role installs Microsoft SQL Server.
 

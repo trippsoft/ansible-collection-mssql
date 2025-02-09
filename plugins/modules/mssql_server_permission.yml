@@ -1,0 +1,158 @@
+---
+DOCUMENTATION:
+  module: mssql_server_permission
+  version_added: 1.0.0
+  author:
+    - Jim Tarpley (@trippsc2)
+  short_description: Configures a SQL server-level permission in a Microsoft SQL Server instance.
+  description:
+    - Configures a SQL server-level permission in a Microsoft SQL Server instance.
+  attributes:
+    check_mode:
+      support: full
+      description:
+        - This module supports check mode.
+  extends_documentation_fragment:
+    - trippsc2.mssql.login
+  options:
+    principal:
+      type: str
+      required: true
+      description:
+        - The name of the SQL login or role for which to configure server-level permissions.
+    permissions:
+      type: list
+      required: true
+      elements: str
+      choices:
+        - administer_bulk_operations
+        - alter_any_availability_group
+        - alter_any_connection
+        - alter_any_credential
+        - alter_any_database
+        - alter_any_endpoint
+        - alter_any_event_notification
+        - alter_any_event_session
+        - alter_any_linked_server
+        - alter_any_login
+        - alter_any_server_audit
+        - alter_any_server_role
+        - alter_resources
+        - alter_server_state
+        - alter_settings
+        - alter_trace
+        - authenticate_server
+        - connect_any_database
+        - connect_sql
+        - control_server
+        - create_any_database
+        - create_availability_group
+        - create_ddl_event_notification
+        - create_endpoint
+        - create_server_role
+        - create_trace_event_notification
+        - external_access_assembly
+        - impersonate_any_login
+        - select_all_user_securables
+        - shutdown
+        - unsafe_assembly
+        - view_any_database
+        - view_any_definition
+        - view_server_state
+      description:
+        - The type of server-level permission to configure.
+    state:
+      type: str
+      required: false
+      default: grant
+      choices:
+        - grant
+        - deny
+        - grant_with_grant_option
+        - revoke
+      description:
+        - The state of the server-level permissions.
+EXAMPLES: |
+  - name: Grant SQL server-level permissions
+    trippsc2.mssql.mssql_server_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      permissions:
+        - connect_sql
+        - view_server_state
+      state: grant
+      
+  - name: Deny SQL server-level permissions
+    trippsc2.mssql.mssql_server_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      permissions:
+        - connect_sql
+        - view_server_state
+      state: deny
+
+  - name: Grant SQL server-level permissions with grant option
+    trippsc2.mssql.mssql_server_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      permissions:
+        - connect_sql
+        - view_server_state
+      state: grant_with_grant_option
+
+  - name: Remove SQL server-level permissions
+    trippsc2.mssql.mssql_server_permission:
+      login_user: sa
+      login_password: password
+      login_host: localhost
+      principal: test
+      permissions:
+        - connect_sql
+        - view_server_state
+      state: revoke
+
+RETURN:
+  current:
+    type: dict
+    returned: O(state=present)
+    description:
+      - The configuration of the SQL server-level permissions.
+    sample:
+      - permission: connect_sql
+        state: grant_with_grant_option
+      - permission: view_server_state
+        state: grant_with_grant_option
+    contains:
+      permission:
+        type: str
+        description:
+          - The server-level permission.
+      state:
+        type: str
+        description:
+          - The state of the server-level permission.
+  previous:
+    type: dict
+    returned: changed
+    description:
+      - The previous configuration of the SQL server-level permissions.
+    sample:
+      - permission: connect_sql
+        state: grant
+      - permission: view_server_state
+        state: deny
+    contains:
+      permission:
+        type: str
+        description:
+          - The server-level permission.
+      state:
+        type: str
+        description:
+          - The state of the server-level permission.
