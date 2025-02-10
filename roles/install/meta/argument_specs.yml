@@ -59,7 +59,7 @@ argument_specs:
       mssql_vault_manage_sa_password:
         type: bool
         required: false
-        default: true
+        default: false
         description:
           - Whether to manage the `sa` password in HashiCorp Vault.
           - On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.

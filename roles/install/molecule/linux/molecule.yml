@@ -45,6 +45,7 @@ provisioner:
         mssql_configure_monitoring: true
         mssql_vault_manage_monitoring_credentials: true
         mssql_vault_configure_database_connection: true
+        mssql_vault_manage_sa_password: true
         mssql_install_full_text: true
         mssql_install_integration_services: "{{ ansible_distribution != 'Ubuntu' }}"
         mssql_vault_sa_mount_point: mssql
