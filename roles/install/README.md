@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.3.2
+Version: 1.3.3
 
 This role installs Microsoft SQL Server.
 
@@ -37,7 +37,7 @@ This role installs Microsoft SQL Server.
 | vault_token | <p>The token for accessing HashiCorp Vault.</p><p>Alternatively, this (or any other authentication method) can be configured through ansible.cfg or environment variables.</p> | str | no |  |  |
 | mssql_configure_firewall | <p>Whether to configure the host firewall for the SQL Server instance.</p> | bool | no |  | True |
 | mssql_configure_monitoring | <p>Whether to configure monitoring for the SQL Server instance.</p> | bool | no |  | False |
-| mssql_vault_manage_sa_password | <p>Whether to manage the `sa` password in HashiCorp Vault.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | True |
+| mssql_vault_manage_sa_password | <p>Whether to manage the `sa` password in HashiCorp Vault.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | False |
 | mssql_vault_manage_monitoring_credentials | <p>Whether to manage the monitoring password in HashiCorp Vault.</p><p>If *mssql_configure_monitoring* is `false`, this is ignored.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | False |
 | mssql_vault_configure_database_connection | <p>Whether to configure the database connection in HashiCorp Vault.</p><p>On Windows, if this is set to `true`, the *mssql_security_mode* must be `mixed`.</p> | bool | no |  | False |
 | mssql_vault_create_secret_engines | <p>Whether to create the secret engines in HashiCorp Vault.</p> | bool | no |  | True |

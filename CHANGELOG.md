@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.3] - 2025-02-13
+
+### mssql_db_object_permission Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
+### mssql_db_permission Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
+### mssql_db_user Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
+### mssql_login Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
+### mssql_server_permission Module Plugin
+
+- Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
+
 ## [1.3.2] - 2025-02-09
 
 ### mssql_db_object_permission Module Plugin

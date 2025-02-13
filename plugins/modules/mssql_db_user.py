@@ -2,6 +2,67 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
+DOCUMENTATION = r"""
+module: mssql_db_user
+version_added: 1.0.0
+author:
+  - Jim Tarpley (@trippsc2)
+short_description: Configures a SQL database user in a Microsoft SQL Server instance.
+description:
+  - Configures a SQL database user in a Microsoft SQL Server instance.
+attributes:
+  check_mode:
+    support: full
+    description:
+      - This module supports check mode.
+extends_documentation_fragment:
+  - trippsc2.mssql.login
+options:
+  name:
+    type: str
+    required: true
+    description:
+      - The name of the SQL Login to configure as a database user.
+  database:
+    type: str
+    required: true
+    description:
+      - The name of the database for which to configure the SQL Login as a user.
+  state:
+    type: str
+    required: false
+    default: present
+    choices:
+      - present
+      - absent
+    description:
+      - The desired state of the SQL Login.
+"""
+
+EXAMPLES = r"""
+- name: Create a SQL database user
+  trippsc2.mssql.mssql_login:
+    login_user: sa
+    login_password: password
+    login_host: localhost
+    name: test
+    database: tempdb
+    state: present
+
+- name: Remove a SQL database user
+  trippsc2.mssql.mssql_login:
+    login_user: sa
+    login_password: password
+    login_host: localhost
+    name: test
+    database: tempdb
+    state: absent
+"""
+
+RETURN = r"""
+"""
 
 import traceback
 
