@@ -223,10 +223,10 @@ else:
     HAS_PYMSSQL = True
     PYMSSQL_IMPORT_ERROR = None
 
-from typing import Optional, Union
-
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+from typing import Optional, Union
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
@@ -373,7 +373,7 @@ def get_login(name: str, module: MssqlModule) -> Optional[dict]:
         module (MssqlModule): The module object.
 
     Returns:
-        dict: The SQL login.
+        Optional[dict]: The SQL login.
     """
 
     query = f"""
@@ -389,7 +389,7 @@ def get_login(name: str, module: MssqlModule) -> Optional[dict]:
 
     try:
         module.cursor.execute(query)
-        row: dict | None = module.cursor.fetchone()
+        row: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 

@@ -174,10 +174,10 @@ else:
     HAS_PYMSSQL = True
     PYMSSQL_IMPORT_ERROR = None
 
+from ansible.module_utils.common.text.converters import to_native
+
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
-
-from ansible.module_utils.common.text.converters import to_native
 
 
 def run_module():

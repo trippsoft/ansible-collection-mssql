@@ -177,10 +177,10 @@ else:
     HAS_PYMSSQL = True
     PYMSSQL_IMPORT_ERROR = None
 
-from typing import List
-
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
+
+from typing import List, Optional
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
@@ -369,7 +369,7 @@ def get_server_permission(
 
     try:
         module.cursor.execute(query)
-        row: dict | None = module.cursor.fetchone()
+        row: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 

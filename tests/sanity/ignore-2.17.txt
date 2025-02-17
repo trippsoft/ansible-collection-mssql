@@ -1,0 +1,10 @@
+plugins/modules/mssql_db_object_permission.py pylint:unused-import
+plugins/modules/mssql_db_permission.py pylint:unused-import
+plugins/modules/mssql_db_user.py pylint:unused-import
+plugins/modules/mssql_login.py pylint:unused-import
+plugins/modules/mssql_server_permission.py pylint:unused-import
+plugins/modules/mssql_db_object_permission.py validate-modules:missing-gplv3-license
+plugins/modules/mssql_db_permission.py validate-modules:missing-gplv3-license
+plugins/modules/mssql_db_user.py validate-modules:missing-gplv3-license
+plugins/modules/mssql_login.py validate-modules:missing-gplv3-license
+plugins/modules/mssql_server_permission.py validate-modules:missing-gplv3-license
