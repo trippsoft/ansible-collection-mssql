@@ -16,7 +16,7 @@ platforms:
       - windows
       - windows_domain
     provider_options:
-      default_prefix: mssql_install_linux_
+      default_prefix: mssql_login_windows_
   - name: linux
     box: jtarpley/${MOLECULE_BOX:-rocky8_cis}
     memory: 4096
