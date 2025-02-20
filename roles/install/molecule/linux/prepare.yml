@@ -67,3 +67,5 @@
           - "IP:{{ ansible_host }}"
           - IP:127.0.0.1
         cert_copy_ca_chain: true
+        cert_ca_chain_path: >-
+          {{ '/etc/pki/ca-trust/source/anchors/ca_chain.crt' if ansible_os_family == 'RedHat' else '/usr/local/share/ca-certificates/ca_chain.crt' }}
