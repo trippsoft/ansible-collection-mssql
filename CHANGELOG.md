@@ -4,45 +4,45 @@ All notable changes to this project will be documented in this file.
 
 ## [1.3.3] - 2025-02-13
 
-### mssql_db_object_permission Module Plugin
+### Module Plugin - mssql_db_object_permission
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
-### mssql_db_permission Module Plugin
+### Module Plugin - mssql_db_permission
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
-### mssql_db_user Module Plugin
+### Module Plugin - mssql_db_user
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
-### mssql_login Module Plugin
+### Module Plugin - mssql_login
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
-### mssql_server_permission Module Plugin
+### Module Plugin - mssql_server_permission
 
 - Reverted changing documentation from .py file to .yml file because ansible-lint does not parse it correctly yet.
 
 ## [1.3.2] - 2025-02-09
 
-### mssql_db_object_permission Module Plugin
+### Module Plugin - mssql_db_object_permission
 
 - Made various changes for code quality and style improvements suggested by Ansible sanity tests.
 
-### mssql_db_permission Module Plugin
+### Module Plugin - mssql_db_permission
 
 - Made various changes for code quality and style improvements suggested by Ansible sanity tests.
 
-### mssql_db_user Module Plugin
+### Module Plugin - mssql_db_user
 
 - Made various changes for code quality and style improvements suggested by Ansible sanity tests.
 
-### mssql_login Module Plugin
+### Module Plugin - mssql_login
 
 - Made various changes for code quality and style improvements suggested by Ansible sanity tests.
 
-### mssql_server_permission Module Plugin
+### Module Plugin - mssql_server_permission
 
 - Made various changes for code quality and style improvements suggested by Ansible sanity tests.
 
