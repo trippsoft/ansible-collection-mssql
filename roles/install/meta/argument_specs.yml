@@ -5,7 +5,7 @@ argument_specs:
     description:
       - This role installs Microsoft SQL Server.
     author:
-      - Jim Tarpley
+      - Jim Tarpley (@trippsc2)
     options:
       mssql_host:
         type: str
