@@ -16,15 +16,15 @@ platforms:
       - windows
       - windows_domain
     provider_options:
-      default_prefix: mssql_login_windows_
+      default_prefix: mssql_mssql_login_windows_
   - name: linux
-    box: jtarpley/${MOLECULE_BOX:-rocky8_cis}
+    box: jtarpley/${MOLECULE_BOX:-rocky9_cis}
     memory: 4096
     cpus: 2
     groups:
       - subjects
     provider_options:
-      default_prefix: mssql_login_windows_
+      default_prefix: mssql_mssql_login_windows_
 provisioner:
   name: ansible
   inventory:

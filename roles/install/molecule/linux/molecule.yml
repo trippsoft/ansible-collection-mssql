@@ -18,7 +18,7 @@ platforms:
     provider_options:
       default_prefix: mssql_install_linux_
   - name: linux
-    box: jtarpley/${MOLECULE_BOX:-rocky8_cis}
+    box: jtarpley/${MOLECULE_BOX:-rocky9_cis}
     memory: 4096
     cpus: 2
     groups:
