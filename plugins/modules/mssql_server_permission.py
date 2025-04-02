@@ -168,26 +168,26 @@ previous:
 
 import traceback
 
-try:
-    import pymssql
-except ImportError:
-    HAS_PYMSSQL = False
-    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYMSSQL = True
-    PYMSSQL_IMPORT_ERROR = None
-
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from typing import List, Optional
+from typing import Optional
+
+try:
+    import pymssql
+except ImportError:
+    HAS_PYMSSQL: bool = False
+    PYMSSQL_IMPORT_ERROR: Optional[str] = traceback.format_exc()
+else:
+    HAS_PYMSSQL: bool = True
+    PYMSSQL_IMPORT_ERROR: Optional[str] = None
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
 
 
-def run_module():
-    module = MssqlModule(
+def run_module() -> None:
+    module: MssqlModule = MssqlModule(
         argument_spec=dict(
             principal=dict(type='str', required=True),
             permissions=dict(
@@ -245,20 +245,20 @@ def run_module():
             msg=missing_required_lib('pymssql'),
             exception=PYMSSQL_IMPORT_ERROR)
 
-    params = module.get_defined_non_connection_params()
+    params: dict = module.get_defined_non_connection_params()
     module.initialize_client()
     validate_params(params, module)
 
-    previous_permissions = get_server_permissions(params['principal'], params['permissions'], module)
+    previous_permissions: dict = get_server_permissions(params['principal'], params['permissions'], module)
 
-    changed = False
+    changed: bool = False
 
-    previous = list[dict]()
-    current = list[dict]()
+    previous: list[dict] = []
+    current: list[dict] = []
 
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
-            changed = True
+            changed: bool = True
 
         if previous_state != 'revoke':
             previous.append(dict(permission=permission, state=previous_state))
@@ -277,14 +277,14 @@ def run_module():
 
     if len(previous) > 0:
         if len(current) > 0:
-            result = dict(changed=changed, previous=previous, current=current)
+            result: dict = dict(changed=changed, previous=previous, current=current)
         else:
-            result = dict(changed=changed, previous=previous)
+            result: dict = dict(changed=changed, previous=previous)
     else:
         if len(current) > 0:
-            result = dict(changed=changed, current=current)
+            result: dict = dict(changed=changed, current=current)
         else:
-            result = dict(changed=changed)
+            result: dict = dict(changed=changed)
 
     module.close_client_session()
     module.exit_json(**result)
@@ -302,11 +302,11 @@ def validate_params(params: dict, module: MssqlModule) -> None:
     if len(params['permissions']) < 1:
         module.handle_error(MssqlModuleError(message='At least one permission must be specified.'))
 
-    query = f"SELECT name FROM sys.server_principals WHERE name = '{params['principal']}'"
+    query: str = f"SELECT name FROM sys.server_principals WHERE name = '{params['principal']}'"
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -316,7 +316,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 
 def get_server_permissions(
         principal: str,
-        permissions: List[str],
+        permissions: list[str],
         module: MssqlModule) -> dict:
     """
     Gets the server-level permissions.
@@ -330,10 +330,10 @@ def get_server_permissions(
         dict: The relevant server-level permissions.
     """
 
-    results: dict = dict()
+    results: dict = {}
 
     for permission in permissions:
-        results = get_server_permission(principal, permission, module, results)
+        results: dict = get_server_permission(principal, permission, module, results)
 
     return results
 
@@ -356,7 +356,7 @@ def get_server_permission(
         dict: Results of this and previous operations.
     """
 
-    query = f"""
+    query: str = f"""
     SELECT principals.name as name,
             permissions.permission_name as permission,
             permissions.state_desc as state
@@ -417,21 +417,21 @@ def modify_permission(
 
     if state == 'revoke':
         if previous_state == 'grant_with_grant_option':
-            query = f'REVOKE {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
+            query: str = f'REVOKE {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
         else:
-            query = f'REVOKE {convert_permission_to_query(permission)} TO [{principal}];'
+            query: str = f'REVOKE {convert_permission_to_query(permission)} TO [{principal}];'
     elif state == 'grant':
         if previous_state == 'grant_with_grant_option':
-            query = f'REVOKE GRANT OPTION FOR {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
+            query: str = f'REVOKE GRANT OPTION FOR {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
         else:
-            query = f'GRANT {convert_permission_to_query(permission)} TO [{principal}];'
+            query: str = f'GRANT {convert_permission_to_query(permission)} TO [{principal}];'
     elif state == 'deny':
         if previous_state == 'grant_with_grant_option':
-            query = f'DENY {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
+            query: str = f'DENY {convert_permission_to_query(permission)} TO [{principal}] CASCADE;'
         else:
-            query = f'DENY {convert_permission_to_query(permission)} TO [{principal}];'
+            query: str = f'DENY {convert_permission_to_query(permission)} TO [{principal}];'
     elif state == 'grant_with_grant_option':
-        query = f'GRANT {convert_permission_to_query(permission)} TO [{principal}] WITH GRANT OPTION;'
+        query: str = f'GRANT {convert_permission_to_query(permission)} TO [{principal}] WITH GRANT OPTION;'
 
     try:
         module.cursor.execute(query)
@@ -440,7 +440,7 @@ def modify_permission(
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
 
-def main():
+def main() -> None:
     run_module()
 
 

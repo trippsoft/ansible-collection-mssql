@@ -13,6 +13,6 @@ class MssqlModuleError():
     message: str
     exception: Optional[str]
 
-    def __init__(self, message: str, exception: Optional[str] = None):
+    def __init__(self, message: str, exception: Optional[str] = None) -> None:
         self.message = message
         self.exception = exception

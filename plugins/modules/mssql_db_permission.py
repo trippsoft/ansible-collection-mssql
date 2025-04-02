@@ -224,26 +224,26 @@ previous:
 
 import traceback
 
-try:
-    import pymssql
-except ImportError:
-    HAS_PYMSSQL = False
-    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
-else:
-    HAS_PYMSSQL = True
-    PYMSSQL_IMPORT_ERROR = None
-
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from typing import List, Optional
+from typing import Optional
+
+try:
+    import pymssql
+except ImportError:
+    HAS_PYMSSQL: bool = False
+    PYMSSQL_IMPORT_ERROR: Optional[str] = traceback.format_exc()
+else:
+    HAS_PYMSSQL: bool = True
+    PYMSSQL_IMPORT_ERROR: Optional[str] = None
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
 
 
-def run_module():
-    module = MssqlModule(
+def run_module() -> None:
+    module: MssqlModule = MssqlModule(
         argument_spec=dict(
             principal=dict(type='str', required=True),
             database=dict(type='str', required=True),
@@ -349,25 +349,25 @@ def run_module():
             msg=missing_required_lib('pymssql'),
             exception=PYMSSQL_IMPORT_ERROR)
 
-    params = module.get_defined_non_connection_params()
+    params: dict = module.get_defined_non_connection_params()
     module.initialize_client()
     validate_params(params, module)
 
-    previous_permissions = get_db_permissions(
+    previous_permissions: dict = get_db_permissions(
         params['principal'],
         params['database'],
         params['permissions'],
         module
     )
 
-    changed = False
+    changed: bool = False
 
-    previous: List[dict] = list[dict]()
-    current: List[dict] = list[dict]()
+    previous: list[dict] = []
+    current: list[dict] = []
 
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
-            changed = True
+            changed: bool = True
 
         if previous_state != 'revoke':
             previous.append(dict(permission=permission, state=previous_state))
@@ -387,14 +387,14 @@ def run_module():
 
     if len(previous) > 0:
         if len(current) > 0:
-            result = dict(changed=changed, previous=previous, current=current)
+            result: dict = dict(changed=changed, previous=previous, current=current)
         else:
-            result = dict(changed=changed, previous=previous)
+            result: dict = dict(changed=changed, previous=previous)
     else:
         if len(current) > 0:
-            result = dict(changed=changed, current=current)
+            result: dict = dict(changed=changed, current=current)
         else:
-            result = dict(changed=changed)
+            result: dict = dict(changed=changed)
 
     module.close_client_session()
     module.exit_json(**result)
@@ -412,25 +412,25 @@ def validate_params(params: dict, module: MssqlModule) -> None:
     if len(params['permissions']) < 1:
         module.handle_error(MssqlModuleError(message='At least one permission must be specified.'))
 
-    query = f"SELECT name FROM sys.databases WHERE name = '{params['database']}'"
+    query: str = f"SELECT name FROM sys.databases WHERE name = '{params['database']}'"
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
     if result is None:
         module.handle_error(MssqlModuleError(message=f"No database exists with the name '{params['database']}'."))
 
-    query = f"""
+    query: str = f"""
     SELECT name FROM {params['database']}.sys.database_principals
     WHERE name = '{params['principal']}'
     """
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -441,7 +441,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 def get_db_permissions(
         principal: str,
         database: str,
-        permissions: List[str],
+        permissions: list[str],
         module: MssqlModule) -> dict:
     """
     Gets the database-level permissions.
@@ -456,7 +456,7 @@ def get_db_permissions(
         dict: The relevant database-level permissions.
     """
 
-    results: dict = dict()
+    results: dict = {}
 
     for permission in permissions:
         results = get_db_permission(principal, database, permission, module, results)
@@ -484,7 +484,7 @@ def get_db_permission(
         dict: Results of this and previous operations.
     """
 
-    query = f"""
+    query: str = f"""
     SELECT principals.name AS name,
             permissions.class_desc AS class,
             permissions.permission_name AS permission,
@@ -549,39 +549,39 @@ def modify_permission(
 
     if state == 'revoke':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE {convert_permission_to_query(permission)} TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE {convert_permission_to_query(permission)} TO [{principal}]
             """
     elif state == 'grant':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE GRANT OPTION FOR {convert_permission_to_query(permission)} TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             GRANT {convert_permission_to_query(permission)} TO [{principal}]
             """
     elif state == 'deny':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             DENY {convert_permission_to_query(permission)} TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             DENY {convert_permission_to_query(permission)} TO [{principal}]
             """
     elif state == 'grant_with_grant_option':
-        query = f"""
+        query: str = f"""
         USE [{database}];
         GRANT {convert_permission_to_query(permission)} TO [{principal}] WITH GRANT OPTION
         """
@@ -593,7 +593,7 @@ def modify_permission(
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
 
-def main():
+def main() -> None:
     run_module()
 
 

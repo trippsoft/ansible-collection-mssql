@@ -21,8 +21,8 @@ LOGIN_ARGSPEC: dict = dict(
 try:
     import pymssql
 except ImportError:
-    HAS_PYMSSQL = False
-    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+    HAS_PYMSSQL: bool = False
+    PYMSSQL_IMPORT_ERROR: Optional[str] = traceback.format_exc()
 
     class MssqlModule(AnsibleModule):
 
@@ -30,15 +30,12 @@ except ImportError:
                 self,
                 *args,
                 argument_spec: Optional[dict] = None,
-                **kwargs):
+                **kwargs) -> None:
 
             if argument_spec is None:
-                argument_spec = dict()
+                argument_spec: dict = {}
 
-            argspec = MssqlModule.generate_argspec(**argument_spec)
-
-            self.conn = None
-            self.cursor = None
+            argspec: dict = MssqlModule.generate_argspec(**argument_spec)
 
             super(MssqlModule, self).__init__(
                 *args,
@@ -65,8 +62,8 @@ except ImportError:
             )
 
 else:
-    HAS_PYMSSQL = True
-    PYMSSQL_IMPORT_ERROR = None
+    HAS_PYMSSQL: bool = True
+    PYMSSQL_IMPORT_ERROR: Optional[str] = None
 
     class MssqlModule(AnsibleModule):
         """
@@ -80,12 +77,12 @@ else:
                 self,
                 *args,
                 argument_spec: Optional[dict] = None,
-                **kwargs):
+                **kwargs) -> None:
 
             if argument_spec is None:
-                argument_spec = dict()
+                argument_spec: dict = {}
 
-            argspec = MssqlModule.generate_argspec(**argument_spec)
+            argspec: dict = MssqlModule.generate_argspec(**argument_spec)
 
             self.conn = None
             self.cursor = None
@@ -136,7 +133,6 @@ else:
             """
 
             if isinstance(error, MssqlModuleError):
-
                 self.close_client_session()
                 self.fail_json(msg=error.message, exception=error.exception)
 
@@ -172,13 +168,13 @@ else:
                 dict: The defined non-connection parameters for the module.
             """
 
-            filtered_params = self.params.copy()
-            delete_keys = [key for key in self.params.keys() if key in LOGIN_ARGSPEC]
+            filtered_params: dict = self.params.copy()
+            delete_keys: list[str] = [key for key in self.params.keys() if key in LOGIN_ARGSPEC]
 
             for key in delete_keys:
                 del filtered_params[key]
 
-            delete_keys = [key for key in self.params.keys() if self.params[key] is None]
+            delete_keys: list[str] = [key for key in self.params.keys() if self.params[key] is None]
 
             for key in delete_keys:
                 del filtered_params[key]

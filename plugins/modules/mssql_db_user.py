@@ -66,17 +66,19 @@ RETURN = r"""
 
 import traceback
 
+from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
+
+from typing import Optional
+
 try:
     import pymssql
 except ImportError:
-    HAS_PYMSSQL = False
-    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+    HAS_PYMSSQL: bool = False
+    PYMSSQL_IMPORT_ERROR: Optional[str] = traceback.format_exc()
 else:
-    HAS_PYMSSQL = True
-    PYMSSQL_IMPORT_ERROR = None
-
-from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils.common.text.converters import to_native
+    HAS_PYMSSQL: bool = True
+    PYMSSQL_IMPORT_ERROR: Optional[str] = None
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
@@ -118,11 +120,11 @@ def validate_params(params: dict, module: MssqlModule) -> None:
         module (MssqlModule): The Ansible module.
     """
 
-    query = f"SELECT name FROM sys.databases WHERE name = '{params['database']}'"
+    query: str = f"SELECT name FROM sys.databases WHERE name = '{params['database']}'"
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -142,8 +144,8 @@ def ensure_present(params: dict, module: MssqlModule) -> dict:
         dict: The module result.
     """
 
-    name = params['name']
-    database = params['database']
+    name: str = params['name']
+    database: str = params['database']
 
     if not get_login(name, module):
         module.handle_error(MssqlModuleError(message=f"No server login exists for '{name}'."))
@@ -152,7 +154,7 @@ def ensure_present(params: dict, module: MssqlModule) -> dict:
         return dict(changed=False)
 
     if not module.check_mode:
-        query = f"""
+        query: str = f"""
         USE [{database}];
         CREATE USER [{name}] FOR LOGIN [{name}]
         """
@@ -178,14 +180,14 @@ def ensure_absent(params: dict, module: MssqlModule) -> dict:
         dict: The module result.
     """
 
-    name = params['name']
-    database = params['database']
+    name: str = params['name']
+    database: str = params['database']
 
     if not get_user(name, database, module):
         return dict(changed=False)
 
     if not module.check_mode:
-        query = f"""
+        query: str = f"""
         USE [{database}];
         DROP USER [{name}]
         """
@@ -211,11 +213,11 @@ def get_login(name: str, module: MssqlModule) -> bool:
         bool: True if the login exists, False otherwise.
     """
 
-    query = f"SELECT name FROM sys.server_principals WHERE name = '{name}'"
+    query: str = f"SELECT name FROM sys.server_principals WHERE name = '{name}'"
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -235,18 +237,18 @@ def get_user(name: str, database: str, module: MssqlModule) -> bool:
         bool: True if the user exists, False otherwise.
     """
 
-    query = f"SELECT name FROM {database}.sys.database_principals WHERE name = '{name}'"
+    query: str = f"SELECT name FROM {database}.sys.database_principals WHERE name = '{name}'"
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
     return result is not None
 
 
-def main():
+def main() -> None:
     run_module()
 
 

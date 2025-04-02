@@ -165,23 +165,25 @@ previous:
 
 import traceback
 
+from ansible.module_utils.common.text.converters import to_native
+
+from typing import Optional
+
 try:
     import pymssql
 except ImportError:
-    HAS_PYMSSQL = False
-    PYMSSQL_IMPORT_ERROR = traceback.format_exc()
+    HAS_PYMSSQL: bool = False
+    PYMSSQL_IMPORT_ERROR: Optional[str] = traceback.format_exc()
 else:
-    HAS_PYMSSQL = True
-    PYMSSQL_IMPORT_ERROR = None
-
-from ansible.module_utils.common.text.converters import to_native
+    HAS_PYMSSQL: bool = True
+    PYMSSQL_IMPORT_ERROR: Optional[str] = None
 
 from ..module_utils._mssql_module import MssqlModule
 from ..module_utils._mssql_module_error import MssqlModuleError
 
 
-def run_module():
-    module = MssqlModule(
+def run_module() -> None:
+    module: MssqlModule = MssqlModule(
         argument_spec=dict(
             principal=dict(type='str', required=True),
             database=dict(type='str', required=True),
@@ -215,16 +217,16 @@ def run_module():
         )
     )
 
-    params = module.get_defined_non_connection_params()
+    params: dict = module.get_defined_non_connection_params()
     module.initialize_client()
     validate_params(params, module)
 
     if params.get('schema', None) is None:
-        schema = resolve_schema(params['database'], params['object'], module)
+        schema: str = resolve_schema(params['database'], params['object'], module)
     else:
-        schema = params['schema']
+        schema: str = params['schema']
 
-    previous_permissions = get_db_object_permissions(
+    previous_permissions: dict = get_db_object_permissions(
         params['principal'],
         params['database'],
         schema,
@@ -233,14 +235,14 @@ def run_module():
         module
     )
 
-    changed = False
+    changed: bool = False
 
-    previous = list[dict]()
-    current = list[dict]()
+    previous: list[dict] = []
+    current: list[dict] = []
 
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
-            changed = True
+            changed: bool = True
 
         if previous_state != 'revoke':
             previous.append(dict(permission=permission, state=previous_state))
@@ -262,14 +264,14 @@ def run_module():
 
     if len(previous) > 0:
         if len(current) > 0:
-            result = dict(changed=changed, previous=previous, current=current)
+            result: dict = dict(changed=changed, previous=previous, current=current)
         else:
-            result = dict(changed=changed, previous=previous)
+            result: dict = dict(changed=changed, previous=previous)
     else:
         if len(current) > 0:
-            result = dict(changed=changed, current=current)
+            result: dict = dict(changed=changed, current=current)
         else:
-            result = dict(changed=changed)
+            result: dict = dict(changed=changed)
 
     module.close_client_session()
     module.exit_json(**result)
@@ -291,21 +293,21 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
     if result is None:
         module.handle_error(MssqlModuleError(message=f"No database exists with the name '{params['database']}'."))
 
-    query = f"""
+    query: str = f"""
     SELECT name FROM {params['database']}.sys.database_principals
     WHERE name = '{params['principal']}'
     """
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -313,11 +315,11 @@ def validate_params(params: dict, module: MssqlModule) -> None:
         module.handle_error(MssqlModuleError(message=f"No database principal exists with the name '{params['principal']}'."))
 
     if params.get('schema', None) is None:
-        query = f"SELECT name FROM {params['database']}.sys.objects WHERE name = '{params['object']}'"
+        query: str = f"SELECT name FROM {params['database']}.sys.objects WHERE name = '{params['object']}'"
 
         try:
             module.cursor.execute(query)
-            result = module.cursor.fetchall()
+            result: Optional[list] = module.cursor.fetchall()
         except Exception as e:
             module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -327,7 +329,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
         if len(result) > 1:
             module.handle_error(MssqlModuleError(message=f"Multiple objects exist with the name '{params['object']}'. Please specify the schema."))
     else:
-        query = f"""
+        query: str = f"""
         SELECT objects.name FROM {params['database']}.sys.objects objects
         JOIN {params['database']}.sys.schemas schemas
         ON objects.schema_id = schemas.schema_id
@@ -337,7 +339,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 
         try:
             module.cursor.execute(query)
-            result = module.cursor.fetchone()
+            result: Optional[dict] = module.cursor.fetchone()
         except Exception as e:
             module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -345,7 +347,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
             module.handle_error(MssqlModuleError(message=f"No object exists with the name '{params['object']}' in the schema '{params['schema']}'."))
 
 
-def resolve_schema(database: str, object: str, module: MssqlModule) -> str:
+def resolve_schema(database: str, object_name: str, module: MssqlModule) -> str:
     """
     Resolves the schema of the database object.
 
@@ -358,18 +360,18 @@ def resolve_schema(database: str, object: str, module: MssqlModule) -> str:
         str: The name of the schema.
     """
 
-    query = f"""
+    query: str = f"""
     SELECT objects.name AS name,
             schemas.name AS schema_name
     FROM {database}.sys.objects objects
     JOIN {database}.sys.schemas schemas
     ON objects.schema_id = schemas.schema_id
-    WHERE objects.name = '{object}'
+    WHERE objects.name = '{object_name}'
     """
 
     try:
         module.cursor.execute(query)
-        result = module.cursor.fetchone()
+        result: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -398,10 +400,10 @@ def get_db_object_permissions(
         dict: The database object-level permissions.
     """
 
-    results: dict = dict()
+    results: dict = {}
 
     for permission in permissions:
-        results = get_db_object_permission(
+        results: dict = get_db_object_permission(
             principal,
             database,
             schema,
@@ -418,7 +420,7 @@ def get_db_object_permission(
         principal: str,
         database: str,
         schema: str,
-        object: str,
+        object_name: str,
         permission: str,
         module: MssqlModule,
         results: dict) -> dict:
@@ -438,7 +440,7 @@ def get_db_object_permission(
         dict: The database object-level permissions.
     """
 
-    query = f"""
+    query: str = f"""
     SELECT principals.name AS name,
             permissions.class_desc AS class,
             permissions.permission_name AS permission,
@@ -451,7 +453,7 @@ def get_db_object_permission(
     JOIN {database}.sys.schemas schemas
     ON objects.schema_id = schemas.schema_id
     WHERE principals.name = '{principal}'
-    AND objects.name = '{object}'
+    AND objects.name = '{object_name}'
     AND schemas.name = '{schema}'
     AND permissions.class_desc = 'OBJECT_OR_COLUMN'
     AND permissions.permission_name = '{convert_permission_to_query(permission)}'
@@ -459,7 +461,7 @@ def get_db_object_permission(
 
     try:
         module.cursor.execute(query)
-        row = module.cursor.fetchone()
+        row: Optional[dict] = module.cursor.fetchone()
     except Exception as e:
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
@@ -513,14 +515,14 @@ def modify_permission(
 
     if state == 'revoke':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
                 TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
@@ -528,14 +530,14 @@ def modify_permission(
             """
     elif state == 'grant':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             REVOKE GRANT OPTION FOR {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
                 TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             GRANT {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
@@ -543,21 +545,21 @@ def modify_permission(
             """
     elif state == 'deny':
         if previous_state == 'grant_with_grant_option':
-            query = f"""
+            query: str = f"""
             USE [{database}];
             DENY {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
                 TO [{principal}] CASCADE
             """
         else:
-            query = f"""
+            query: str = f"""
             USE [{database}];
             DENY {convert_permission_to_query(permission)}
                 ON OBJECT::{schema}.{object}
                 TO [{principal}];
             """
     elif state == 'grant_with_grant_option':
-        query = f"""
+        query: str = f"""
         USE [{database}];
         GRANT {convert_permission_to_query(permission)}
             ON OBJECT::{schema}.{object}
@@ -571,7 +573,7 @@ def modify_permission(
         module.handle_error(MssqlModuleError(message=to_native(e), exception=e))
 
 
-def main():
+def main() -> None:
     run_module()
 
 
