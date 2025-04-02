@@ -171,7 +171,7 @@ import traceback
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils.common.text.converters import to_native
 
-from typing import Optional
+from typing import List, Optional
 
 try:
     import pymssql
@@ -253,8 +253,8 @@ def run_module() -> None:
 
     changed: bool = False
 
-    previous: list[dict] = []
-    current: list[dict] = []
+    previous: List[dict] = []
+    current: List[dict] = []
 
     for permission, previous_state in previous_permissions.items():
         if previous_state != params['state']:
@@ -316,7 +316,7 @@ def validate_params(params: dict, module: MssqlModule) -> None:
 
 def get_server_permissions(
         principal: str,
-        permissions: list[str],
+        permissions: List[str],
         module: MssqlModule) -> dict:
     """
     Gets the server-level permissions.
