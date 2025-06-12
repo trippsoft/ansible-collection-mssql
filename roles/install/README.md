@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.3.3
+Version: 1.3.4
 
 This role installs Microsoft SQL Server.
 
@@ -10,8 +10,8 @@ This role installs Microsoft SQL Server.
 | Platform | Versions |
 | -------- | -------- |
 | EL | <ul><li>8</li><li>9</li></ul> |
-| Ubuntu | <ul><li>focal</li><li>jammy</li></ul> |
-| Windows | <ul><li>2019</li><li>2022</li></ul> |
+| Ubuntu | <ul><li>jammy</li></ul> |
+| Windows | <ul><li>2025</li><li>2022</li><li>2019</li></ul> |
 
 ## Dependencies
 
@@ -148,5 +148,5 @@ This role installs Microsoft SQL Server.
 MIT
 
 ## Author and Project Information
-Jim Tarpley
+Jim Tarpley (@trippsc2)
 <!-- END_ANSIBLE_DOCS -->
