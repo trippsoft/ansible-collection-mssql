@@ -16,12 +16,12 @@ galaxy_info:
         - '9'
     - name: Ubuntu
       versions:
-        - focal
         - jammy
     - name: Windows
       versions:
-        - '2019'
+        - '2025'
         - '2022'
+        - '2019'
 
 collections:
   - ansible.posix

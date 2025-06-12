@@ -1,0 +1,5 @@
+---
+collections:
+  - microsoft.ad
+  - trippsc2.ad
+  - trippsc2.hashi_vault

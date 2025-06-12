@@ -53,7 +53,7 @@
     state: restarted
 
 - name: Reboot
-  listen: _mssql_reboot
+  listen: _mssql_win_reboot
   when:
     - ansible_os_family == 'Windows'
     - not mssql_skip_reboot

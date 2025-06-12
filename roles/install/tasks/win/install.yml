@@ -97,4 +97,4 @@
     FailoverClusterIPAddress: "{{ mssql_failover_cluster_ip_address | default(omit) }}"
     FailoverClusterNetworkName: "{{ mssql_failover_cluster_network_name | default(omit) }}"
   notify:
-    - _mssql_reboot
+    - _mssql_win_reboot

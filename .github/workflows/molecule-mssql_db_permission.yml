@@ -1,0 +1,46 @@
+---
+name: Molecule - mssql_db_permission module plugin
+'on':
+  workflow_call: {}
+  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - main
+    paths:
+      - galaxy.yml
+      - plugins/module_utils/_mssql_module.py
+      - plugins/module_utils/_mssql_module_error.py
+      - plugins/modules/mssql_db_permission.py
+  push:
+    branches:
+      - main
+    paths:
+      - galaxy.yml
+      - plugins/module_utils/_mssql_module.py
+      - plugins/module_utils/_mssql_module_error.py
+      - plugins/modules/mssql_db_permission.py
+defaults:
+  run:
+    working-directory: 'trippsc2.mssql'
+jobs:
+  molecule:
+    name: Run Molecule tests
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'trippsc2.mssql'
+      - name: Run Molecule tests
+        run: |
+          source ~/venv/ansible-2.16/bin/activate
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          molecule test -s mssql_db_permission
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          deactivate
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          PY_COLORS: '1'

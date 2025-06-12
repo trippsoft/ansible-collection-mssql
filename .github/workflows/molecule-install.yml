@@ -1,0 +1,113 @@
+---
+name: Molecule - install role
+'on':
+  workflow_call: {}
+  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - main
+    paths:
+      - galaxy.yml
+      - roles/install/**
+      - '!roles/install/.aar_doc.yml'
+      - '!roles/install/README.md'
+      - '!roles/install/meta/argument_specs.yml'
+      - '!roles/install/meta/main.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - galaxy.yml
+      - roles/install/**
+      - '!roles/install/.aar_doc.yml'
+      - '!roles/install/README.md'
+      - '!roles/install/meta/argument_specs.yml'
+      - '!roles/install/meta/main.yml'
+defaults:
+  run:
+    working-directory: 'trippsc2.mssql'
+jobs:
+  molecule_linux:
+    name: Run Molecule tests - Linux
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    strategy:
+      fail-fast: false
+      matrix:
+        box:
+          - rocky9_cis
+          - rocky8_cis
+          - ubuntu2204_base
+        version:
+          - '2022'
+          - '2019'
+          - '2017'
+        exclude:
+          - box: rocky9_cis
+            version: '2019'
+          - box: rocky9_cis
+            version: '2017'
+          - box: ubuntu2204_base
+            version: '2019'
+          - box: ubuntu2204_base
+            version: '2017'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'trippsc2.mssql'
+      - name: Run Molecule tests
+        run: |
+          source ~/venv/ansible-2.16/bin/activate
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          cd ./roles/install
+          molecule test -s linux
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          deactivate
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          PY_COLORS: '1'
+          MOLECULE_BOX: ${{ matrix.box }}
+          MOLECULE_MSSQL_VERSION: ${{ matrix.version }}
+  molecule_windows:
+    name: Run Molecule tests - Windows
+    runs-on:
+      - self-hosted
+      - linux
+      - x64
+    strategy:
+      fail-fast: false
+      matrix:
+        box:
+          - w2025_cis
+          - w2022_cis
+          - w2019_cis
+        version:
+          - '2022'
+          - '2019'
+          - '2017'
+        exclude:
+          - box: w2025_cis
+            version: '2017'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: 'trippsc2.citrix'
+      - name: Run Molecule tests
+        run: |
+          source ~/venv/ansible-2.16/bin/activate
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          ln -s ~/files/ansible-collection-mssql/win ./roles/install/molecule/win/files
+          cd ./roles/install
+          molecule test -S win
+          rm -rf ~/.ansible/collections/ansible_collections/*
+          rm ../../molecule/win/files
+          deactivate
+        env:
+          ANSIBLE_FORCE_COLOR: '1'
+          PY_COLORS: '1'
+          MOLECULE_BOX: ${{ matrix.box }}
+          MOLECULE_MSSQL_VERSION: ${{ matrix.version }}
