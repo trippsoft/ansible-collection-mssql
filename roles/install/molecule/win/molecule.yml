@@ -53,6 +53,7 @@ provisioner:
         mssql_host: "{{ ansible_host }}"
         mssql_user: sa
         mssql_configure_monitoring: true
+        mssql_vault_manage_sa_password: true
         mssql_vault_manage_monitoring_credentials: true
         mssql_vault_configure_database_connection: true
         mssql_install_database_engine: true
