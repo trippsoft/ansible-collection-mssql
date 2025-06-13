@@ -21,4 +21,4 @@ _mssql_server_is_package_available_by_version:
   '2019': true
   '2022': true
 
-_mssql_server_is_package_available: "{{ _mssql_server_is_package_available_by_version[mssql_version] }}"
+_mssql_server_is_package_available: "{{ _mssql_server_is_package_available_by_version[mssql_version | string] }}"
