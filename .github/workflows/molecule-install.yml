@@ -95,7 +95,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          path: 'trippsc2.citrix'
+          path: 'trippsc2.mssql'
       - name: Run Molecule tests
         run: |
           source ~/venv/ansible-2.16/bin/activate
@@ -104,7 +104,7 @@ jobs:
           cd ./roles/install
           molecule test -s win
           rm -rf ~/.ansible/collections/ansible_collections/*
-          rm ../../molecule/win/files
+          rm ./molecule/win/files
           deactivate
         env:
           ANSIBLE_FORCE_COLOR: '1'
