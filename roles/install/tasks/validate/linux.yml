@@ -1,4 +1,11 @@
 ---
+- name: Validate SQL Server version
+  ansible.builtin.assert:
+    that:
+      - mssql_version | string in _mssql_supported_server_versions
+    fail_msg: "SQL Server version {{ mssql_version }} is not supported on {{ ansible_distribution }} {{ ansible_distribution_release }}."
+    success_msg: "SQL Server version {{ mssql_version }} is supported on {{ ansible_distribution }} {{ ansible_distribution_release }}."
+
 - name: Validate HashiCorp Vault SA credentials variables
   when:
     - mssql_vault_manage_sa_password

@@ -1,5 +1,0 @@
----
-_mssql_supported_releases:
-  - jammy
-
-_mssql_default_firewall_type: ufw

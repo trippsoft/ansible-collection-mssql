@@ -1,4 +1,7 @@
 ---
+_mssql_is_os_supported: true
+_mssql_is_tested: true
+
 _mssql_security_mode_values:
   mixed: SQL
   windows: Windows

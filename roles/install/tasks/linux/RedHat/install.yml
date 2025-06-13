@@ -67,6 +67,7 @@
 - name: Install SQL Server Integration Services
   when:
     - mssql_install_integration_services
+    - _mssql_server_is_package_available
   become: true
   environment:
     ACCEPT_EULA: 'Y'
@@ -77,6 +78,17 @@
     update_cache: true
   notify:
     - _mssql_configure_integration_services
+
+- name: Warn if SQL Server Integration Services is not available.
+  when:
+    - mssql_install_integration_services
+    - not _mssql_server_is_package_available
+  ansible.builtin.debug:
+    msg: "WARNING: SQL Server Integration Services is not available for this version of SQL Server on this distribution. Skipping installation. Blame Microsoft."
+  changed_when: true
+  tags:
+    - always
+    - molecule-idempotence-notest
 
 - name: Install SQL Server AD tools
   when:

@@ -1,8 +1,0 @@
----
-_mssql_supported_major_versions:
-  - '8'
-  - '9'
-
-_mssql_default_firewall_type: firewalld
-
-_mssql_default_database_backup_path: /var/opt/mssql/data

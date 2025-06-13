@@ -2,7 +2,13 @@
 _mssql_supported_server_versions:
   - '2022'
 
+_mssql_default_firewall_type: ufw
+
+_mssql_default_database_backup_path: /var/opt/mssql/data
+
 _mssql_prod_repo_url: https://packages.microsoft.com/ubuntu/22.04/prod
 
 _mssql_server_repo_url: >-
   https://packages.microsoft.com/ubuntu/22.04/mssql-server-{{ mssql_version }}
+
+_mssql_server_is_package_available: false

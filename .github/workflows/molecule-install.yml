@@ -102,7 +102,7 @@ jobs:
           rm -rf ~/.ansible/collections/ansible_collections/*
           ln -s ~/files/ansible-collection-mssql/win ./roles/install/molecule/win/files
           cd ./roles/install
-          molecule test -S win
+          molecule test -s win
           rm -rf ~/.ansible/collections/ansible_collections/*
           rm ../../molecule/win/files
           deactivate
