@@ -19,6 +19,12 @@
     home: /var/opt/mssql
     createhome: false
 
+- name: Update apt cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
 - name: Install SQL Server tools
   become: true
   environment:
@@ -28,8 +34,6 @@
       - mssql-tools18
       - unixodbc-dev
     state: present
-    update_cache: true
-    cache_valid_time: 3600
 
 - name: Install SQL Server database engine
   become: true

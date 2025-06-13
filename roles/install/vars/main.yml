@@ -9,7 +9,6 @@ _mssql_pid_values:
   enterprise_core: EnterpriseCore
 
 _mssql_major_version_values:
-  '2016': '13'
   '2017': '14'
   '2019': '15'
   '2022': '16'

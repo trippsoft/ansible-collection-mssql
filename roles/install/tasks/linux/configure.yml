@@ -184,6 +184,8 @@
     - name: Authenticate with Kerberos
       become: true
       become_user: mssql
+      vars:
+        ansible_ssh_pipelining: true
       ansible.builtin.expect:
         command: "kinit {{ mssql_active_directory_admin_username }}@{{ mssql_active_directory_realm }}"
         responses:
@@ -195,6 +197,8 @@
       become_user: mssql
       environment:
         MSSQL_CONF_PASSWORD: "{{ mssql_active_directory_password }}"
+      vars:
+        ansible_ssh_pipelining: true
       ansible.builtin.command:
         cmd: "/opt/mssql/bin/mssql-conf -n setup-ad-keytab {{ mssql_active_directory_keytab_path }} {{ mssql_active_directory_user }}"
         creates: "{{ mssql_active_directory_keytab_path }}"
