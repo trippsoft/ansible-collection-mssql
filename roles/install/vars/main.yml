@@ -1,5 +1,23 @@
 ---
-_mssql_supported_releases:
-  - jammy
+_mssql_pid_values:
+  evaluation: Evaluation
+  developer: Developer
+  express: Express
+  web: Web
+  standard: Standard
+  enterprise: Enterprise
+  enterprise_core: EnterpriseCore
 
-_mssql_default_firewall_type: ufw
+_mssql_major_version_values:
+  '2016': '13'
+  '2017': '14'
+  '2019': '15'
+  '2022': '16'
+
+_mssql_database_pid: "{{ _mssql_pid_values[mssql_database_edition] }}"
+_mssql_integration_pid: "{{ _mssql_pid_values[mssql_integration_services_edition] }}"
+_mssql_major_version: "{{ _mssql_major_version_values[mssql_version | string] }}"
+
+_mssql_firewall_type: "{{ mssql_firewall_type | default(_mssql_default_firewall_type) }}"
+_mssql_database_backup_path: >-
+  {{ mssql_database_backup_path | default(_mssql_default_database_backup_path) }}
