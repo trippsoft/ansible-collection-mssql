@@ -51,7 +51,7 @@ jobs:
             version: '2019'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: 'trippsc2.mssql'
       - name: Run Molecule tests
@@ -90,7 +90,7 @@ jobs:
             version: '2017'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: 'trippsc2.mssql'
       - name: Run Molecule tests
