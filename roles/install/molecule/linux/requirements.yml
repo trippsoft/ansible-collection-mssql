@@ -1,6 +1,8 @@
 ---
 collections:
-  - microsoft.ad
-  - trippsc2.ad
-  - trippsc2.hashi_vault
-  - trippsc2.windows
+  - name: community.general
+    version: <12.0.0
+  - name: microsoft.ad
+  - name: trippsc2.ad
+  - name: trippsc2.hashi_vault
+  - name: trippsc2.windows
