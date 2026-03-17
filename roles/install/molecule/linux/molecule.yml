@@ -69,6 +69,9 @@ provisioner:
         mssql_database_tls_protocols:
           - 1.2
       windows:
+        choco_configure_testing_repo: ${MOLECULE_CONFIGURE_TESTING_REPO:-true}
+        choco_testing_repo_name: Testing
+        choco_testing_repo_url: ${MOLECULE_TESTING_REPO_URL:-http://192.168.81.5:8081/repository/chocolatey-proxy/}
         ansible_shell_type: powershell
         ansible_become_method: runas
         ansible_become_user: SYSTEM

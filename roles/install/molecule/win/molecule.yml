@@ -50,6 +50,9 @@ provisioner:
         vault_url: "http://{{ hostvars['vault'].ansible_host }}:8200"
       subjects:
         _mssql_setup_source_path: "files/{{ mssql_version }}"
+        choco_configure_testing_repo: ${MOLECULE_CONFIGURE_TESTING_REPO:-true}
+        choco_testing_repo_name: Testing
+        choco_testing_repo_url: ${MOLECULE_TESTING_REPO_URL:-http://192.168.81.5:8081/repository/chocolatey-proxy/}
         mssql_host: "{{ ansible_host }}"
         mssql_user: sa
         mssql_configure_monitoring: true

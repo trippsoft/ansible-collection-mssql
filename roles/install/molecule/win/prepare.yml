@@ -36,6 +36,7 @@
   gather_facts: false
   roles:
     - role: trippsc2.ad.testing_win_member
+    - role: trippsc2.windows.testing_chocolatey
   tasks:
     - name: Copy SQL Server installation media
       ansible.windows.win_copy:
