@@ -37,7 +37,7 @@
         name: mssql
         state: present
         system: true
-    
+
     - name: Create MSSQL user
       become: true
       ansible.builtin.user:

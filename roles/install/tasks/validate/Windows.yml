@@ -11,7 +11,9 @@
       ansible.builtin.assert:
         that:
           - mssql_security_mode == 'mixed'
-        fail_msg: "The 'mssql_security_mode' variable is not set to 'mixed'.  The security mode must be set to 'mixed' to configure HashiCorp Vault."
+        fail_msg: >-
+          The 'mssql_security_mode' variable is not set to 'mixed'.
+          The security mode must be set to 'mixed' to configure HashiCorp Vault.
         success_msg: "The 'mssql_security_mode' variable is set to 'mixed'."
 
     - name: Validate HashiCorp Vault SA credentials variables
@@ -111,7 +113,7 @@
 
 - name: Validate database sysadmin accounts is defined
   when:
-    - mssql_install_database_engine 
+    - mssql_install_database_engine
   ansible.builtin.assert:
     that:
       - mssql_database_sysadmin_accounts is defined
@@ -166,7 +168,9 @@
       ansible.builtin.assert:
         that:
           - mssql_security_mode == 'mixed'
-        fail_msg: "The 'mssql_security_mode' variable is not set to 'mixed'.  The security mode must be set to 'mixed' to configure monitoring."
+        fail_msg: >-
+          The 'mssql_security_mode' variable is not set to 'mixed'.
+          The security mode must be set to 'mixed' to configure monitoring.
         success_msg: "The 'mssql_security_mode' variable is set to 'mixed'."
 
     - name: Validate monitoring user is defined

@@ -18,7 +18,8 @@
     action: allow
     direction: in
     enabled: true
-    service: "{{ mssql_instance_name == 'MSSQLSERVER' | ternary('MSSQLServerOLAPService', 'MSOLAP$' + mssql_instance_name) }}"
+    service: >-
+      {{ mssql_instance_name == 'MSSQLSERVER' | ternary('MSSQLServerOLAPService', 'MSOLAP$' + mssql_instance_name) }}
     state: present
 
 - name: Configure SQL Server Integration Services application firewall rule

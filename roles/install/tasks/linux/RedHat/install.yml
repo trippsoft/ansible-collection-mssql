@@ -84,7 +84,9 @@
     - mssql_install_integration_services
     - not _mssql_server_is_package_available
   ansible.builtin.debug:
-    msg: "WARNING: SQL Server Integration Services is not available for this version of SQL Server on this distribution. Skipping installation. Blame Microsoft."
+    msg: >-
+      WARNING: SQL Server Integration Services is not available for this version of SQL Server on this distribution.
+      Skipping installation. Blame Microsoft.
   changed_when: true
   tags:
     - always

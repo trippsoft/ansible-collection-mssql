@@ -110,7 +110,7 @@
           - _mssql_database_tls_certificate.stat.exists
         fail_msg: "'{{ mssql_database_tls_certificate_path }}' is not a valid path."
         success_msg: "'{{ mssql_database_tls_certificate_path }}' is a valid path."
-    
+
     - name: Check if TLS key path is a valid path
       become: true
       ansible.builtin.stat:

@@ -145,7 +145,7 @@ _mssql_as_server_mode: >-
 _mssql_sql_server_integration_services_username: >-
   {{ mssql_sql_server_integration_services_username | default(omit)
       if mssql_install_integration_services else omit }}
-  
+
 _mssql_sql_server_integration_services_password: >-
   {{ mssql_sql_server_integration_services_password | default(omit)
       if mssql_install_integration_services else omit }}

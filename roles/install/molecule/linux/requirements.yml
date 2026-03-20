@@ -1,7 +1,11 @@
 ---
 collections:
+  - name: community.crypto
+    version: <3.0.0
   - name: community.general
     version: <12.0.0
+  - name: community.hashi_vault
+    version: <7.0.0
   - name: microsoft.ad
   - name: trippsc2.ad
   - name: trippsc2.hashi_vault
