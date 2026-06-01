@@ -1,5 +1,5 @@
 ---
-name: ansible-test
+name: Run ansible-test sanity tests
 'on':
   workflow_call: {}
   workflow_dispatch: {}
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: 'collections/ansible_collections/trippsc2/mssql'
-      - name: Run Molecule tests
+      - name: Run ansible-test sanity tests
         working-directory: 'collections/ansible_collections/trippsc2/mssql'
         run: |
           source ~/venv/ansible-test-${{ matrix.ansible_version }}/bin/activate
