@@ -24,11 +24,12 @@ defaults:
     working-directory: 'collections/ansible_collections/trippsc2/mssql'
 jobs:
   sanity:
-    name: Run ansible-test
-    uses: trippsoft/github-actions/.github/workflows/ansible-test.yml@main
-    with:
-      working_directory: 'collections/ansible_collections/trippsc2/mssql'
-      ansible_version: ${{ matrix.ansible_version }}
+    name: Run ansible-test sanity tests
+    runs-on:
+      - self-hosted
+      - linux
+      - ansible
+      - x64
     strategy:
       fail-fast: false
       matrix:
@@ -36,3 +37,14 @@ jobs:
           - '2.18'
           - '2.17'
           - '2.16'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          path: 'collections/ansible_collections/trippsc2/mssql'
+      - name: Run Molecule tests
+        working-directory: 'collections/ansible_collections/trippsc2/mssql'
+        run: |
+          source ~/venv/ansible-test-${{ matrix.ansible_version }}/bin/activate
+          ansible-test sanity -v --docker
+          deactivate
