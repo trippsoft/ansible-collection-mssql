@@ -1,7 +1,7 @@
 <!-- BEGIN_ANSIBLE_DOCS -->
 
 # Ansible Role: trippsc2.mssql.install
-Version: 1.3.4
+Version: 1.4.0
 
 This role installs Microsoft SQL Server.
 
@@ -9,8 +9,8 @@ This role installs Microsoft SQL Server.
 
 | Platform | Versions |
 | -------- | -------- |
-| EL | <ul><li>8</li><li>9</li></ul> |
-| Ubuntu | <ul><li>jammy</li></ul> |
+| EL | <ul><li>10</li><li>9</li><li>8</li></ul> |
+| Ubuntu | <ul><li>noble</li><li>jammy</li></ul> |
 | Windows | <ul><li>2025</li><li>2022</li><li>2019</li></ul> |
 
 ## Dependencies
@@ -51,7 +51,7 @@ This role installs Microsoft SQL Server.
 | mssql_sa_password | <p>The password for the `sa` account.</p><p>If *mssql_vault_manage_sa_password* is `true`, this is password will be used if the secret does not exist and will be stored in Vault.  Otherwise, the previously stored password will be used.</p><p>If *mssql_vault_manage_sa_password* is `false`, this is required.</p><p>On Windows, if *mssql_security_mode* is `windows`, this is ignored.</p> | str | no |  |  |
 | mssql_vault_sa_mount_point | <p>The mount point for the KV2 secrets engine in HashiCorp Vault.</p><p>If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.</p> | str | no |  |  |
 | mssql_vault_sa_secret_path | <p>The path to the secret in HashiCorp Vault.</p><p>If *mssql_vault_manage_sa_password* is `true` (and *mssql_security_mode* is `mixed` on Windows), this is required. Otherwise, it is ignored.</p> | str | no |  |  |
-| mssql_version | <p>The version of the SQL Server to install.</p><p>On Linux, this will be validated against the distribution release for compatibility.</p><p>On Windows, this must match the version of the installation media.  This will not be validated.</p> | str | yes | <ul><li>2016</li><li>2017</li><li>2019</li><li>2022</li></ul> |  |
+| mssql_version | <p>The version of the SQL Server to install.</p><p>On Linux, this will be validated against the distribution release for compatibility.</p><p>On Windows, this must match the version of the installation media.  This will not be validated.</p> | str | yes | <ul><li>2016</li><li>2017</li><li>2019</li><li>2022</li><li>2025</li></ul> |  |
 | mssql_firewall_type | <p>The type of firewall to configure on Linux systems.</p><p>On Windows, this is ignored.</p><p>On EL systems, this defaults to `firewalld`.</p><p>On Ubuntu systems, this defaults to `ufw`.</p> | str | no | <ul><li>firewalld</li><li>ufw</li></ul> |  |
 | mssql_database_port | <p>The port for the SQL Server instance.</p><p>On Windows, this is ignored.</p> | int | no |  | 1433 |
 | mssql_product_key | <p>The product key to use for the SQL Server installation.</p><p>On Linux, if *mssql_edition* is not defined, this is required.</p><p>On Windows, if the installation media is not pre-activated, this is required.</p> | str | no |  |  |
