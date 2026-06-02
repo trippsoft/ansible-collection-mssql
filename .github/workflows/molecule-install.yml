@@ -38,14 +38,27 @@ jobs:
       fail-fast: false
       matrix:
         box:
+          - rocky10_base
           - rocky9_cis
           - rocky8_cis
+          - ubuntu2404_base
           - ubuntu2204_base
         version:
+          - '2025'
           - '2022'
           - '2019'
         exclude:
+          - box: rocky10_base
+            version: '2022'
+          - box: rocky10_base
+            version: '2019'
           - box: rocky9_cis
+            version: '2019'
+          - box: rocky8_cis
+            version: '2025'
+          - box: ubuntu2404_base
+            version: '2022'
+          - box: ubuntu2404_base
             version: '2019'
           - box: ubuntu2204_base
             version: '2019'

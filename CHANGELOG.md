@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-06-02
+
+### Role - install
+
+- Added support for installing SQL Server 2025.
+- Added support for Enterprise Linux 10.
+- Added support for Ubuntu 24.04.
+
 ## [1.3.4] - 2025-06-11
 
 ### Collection

@@ -3,16 +3,15 @@ _mssql_is_os_supported: true
 _mssql_is_tested: true
 
 _mssql_supported_server_versions:
-  - '2022'
   - '2025'
 
-_mssql_default_firewall_type: firewalld
+_mssql_default_firewall_type: ufw
 
 _mssql_default_database_backup_path: /var/opt/mssql/data
 
-_mssql_prod_repo_url: https://packages.microsoft.com/rhel/9/prod/
+_mssql_prod_repo_url: https://packages.microsoft.com/ubuntu/24.04/prod
 
 _mssql_server_repo_url: >-
-  https://packages.microsoft.com/rhel/9/mssql-server-{{ mssql_version }}/
+  https://packages.microsoft.com/ubuntu/24.04/mssql-server-{{ mssql_version }}
 
 _mssql_server_is_package_available: false

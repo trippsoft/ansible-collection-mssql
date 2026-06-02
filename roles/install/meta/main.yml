@@ -12,10 +12,12 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-        - '8'
+        - '10'
         - '9'
+        - '8'
     - name: Ubuntu
       versions:
+        - noble
         - jammy
     - name: Windows
       versions:

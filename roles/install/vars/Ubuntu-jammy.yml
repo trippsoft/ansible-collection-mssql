@@ -4,6 +4,7 @@ _mssql_is_tested: true
 
 _mssql_supported_server_versions:
   - '2022'
+  - '2025'
 
 _mssql_default_firewall_type: ufw
 

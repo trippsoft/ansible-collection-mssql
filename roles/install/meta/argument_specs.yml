@@ -164,6 +164,7 @@ argument_specs:
           - '2017'
           - '2019'
           - '2022'
+          - '2025'
         description:
           - The version of the SQL Server to install.
           - On Linux, this will be validated against the distribution release for compatibility.

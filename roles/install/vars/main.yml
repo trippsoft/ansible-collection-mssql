@@ -12,6 +12,7 @@ _mssql_major_version_values:
   '2017': '14'
   '2019': '15'
   '2022': '16'
+  '2025': '17'
 
 _mssql_database_pid: "{{ _mssql_pid_values[mssql_database_edition] }}"
 _mssql_integration_pid: "{{ _mssql_pid_values[mssql_integration_services_edition] }}"
